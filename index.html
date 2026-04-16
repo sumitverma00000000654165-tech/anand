@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Alpha Study | Set Practice Platform</title>
+  <!-- Font Awesome 6 & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f7fe;
+      color: #1e293b;
+      scroll-behavior: smooth;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ========== ANIMATIONS & EFFECTS ========== */
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes subtleGlow {
+      0% { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03); }
+      50% { box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08); }
+      100% { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03); }
+    }
+
+    .card-animate {
+      animation: fadeInUp 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+      opacity: 0;
+    }
+
+    /* Header */
+    .main-header {
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(2px);
+    }
+
+    .header-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .logo-area:hover { transform: scale(1.02); }
+
+    .logo-icon {
+      background: linear-gradient(135deg, #1e3c72, #2b4c8a);
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 1.3rem;
+      background: linear-gradient(120deg, #1e3c72, #2a5f8a);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .site-name {
+      font-weight: 800;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, #0f2b3d, #1e4a76);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .notify-icon {
+      background: #f1f5f9;
+      width: 44px;
+      height: 44px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #1e4a76;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .notify-icon:hover {
+      background: #e2e8f0;
+      transform: scale(1.02) rotate(5deg);
+    }
+    .notify-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 30px;
+      border: 2px solid white;
+      animation: pulseBadge 1.5s infinite;
+    }
+    @keyframes pulseBadge {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.9; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .welcome-strip {
+      background: linear-gradient(98deg, #eef2ff, #ffffff);
+      margin-top: 8px;
+      margin-bottom: 20px;
+      padding: 12px 20px;
+      border-radius: 60px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      transition: all 0.2s;
+    }
+    .welcome-strip i {
+      font-size: 1.8rem;
+      color: #f59e0b;
+      animation: wave 2s infinite;
+    }
+    @keyframes wave {
+      0%,100% { transform: rotate(0deg); }
+      25% { transform: rotate(10deg); }
+      75% { transform: rotate(-5deg); }
+    }
+
+    /* Slider */
+    .slider-section {
+      margin: 20px 0 30px;
+      position: relative;
+    }
+    .slider-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 28px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+      transition: box-shadow 0.3s;
+    }
+    .slider-container:hover {
+      box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.3);
+    }
+    .slides-wrapper {
+      display: flex;
+      transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      will-change: transform;
+    }
+    .slide {
+      flex: 0 0 100%;
+      background-size: cover;
+      background-position: center;
+      min-height: 280px;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .slide:hover {
+      filter: brightness(1.02);
+    }
+    .slide h2 {
+      font-size: 1.7rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: -0.3px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .slide p {
+      font-size: 1rem;
+      line-height: 1.4;
+      max-width: 80%;
+      opacity: 0.9;
+    }
+    .btn-slide {
+      display: inline-block;
+      margin-top: 20px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(8px);
+      color: white;
+      padding: 8px 22px;
+      border-radius: 40px;
+      font-weight: 600;
+      width: fit-content;
+      font-size: 0.85rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.25s ease;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .btn-slide:hover {
+      background: rgba(255,255,255,0.35);
+      transform: translateX(5px);
+    }
+    .slider-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.9);
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 60px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1e3c72;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      transition: all 0.2s;
+    }
+    .slider-btn:hover {
+      background: white;
+      transform: translateY(-50%) scale(1.08);
+    }
+    .btn-prev { left: 16px; }
+    .btn-next { right: 16px; }
+    .dots {
+      text-align: center;
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      background: #cbd5e1;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+    }
+    .dot.active {
+      background: #f97316;
+      width: 26px;
+      box-shadow: 0 0 6px #f97316;
+    }
+
+    /* 12 sections grid */
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 40px 0 20px 0;
+      position: relative;
+      display: inline-block;
+    }
+    .section-title:after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60%;
+      height: 4px;
+      background: linear-gradient(90deg, #f97316, #ffb347);
+      border-radius: 4px;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 24px;
+      margin: 30px 0 40px;
+    }
+    
+    /* ========== CARD AS ANCHOR LINK (CUSTOM REDIRECT SYSTEM) ========== */
+    a.resource-card {
+      background: white;
+      border-radius: 24px;
+      padding: 20px 14px;
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(0,0,0,0.03);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    a.resource-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #f97316, #ffb347);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    a.resource-card:hover::before {
+      transform: scaleX(1);
+    }
+    a.resource-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 24px 36px -12px rgba(0, 0, 0, 0.2);
+    }
+    .card-icon {
+      font-size: 2.6rem;
+      color: #2c6e9e;
+      margin-bottom: 14px;
+      transition: transform 0.2s ease;
+    }
+    a.resource-card:hover .card-icon {
+      transform: scale(1.1);
+      color: #f97316;
+    }
+    .badge-new {
+      background: #f97316;
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 10px;
+      border-radius: 30px;
+      display: inline-block;
+      margin-top: 10px;
+      width: fit-content;
+      align-self: center;
+    }
+    a.resource-card h4 {
+      font-size: 1.1rem;
+      margin: 8px 0 4px;
+    }
+    a.resource-card p {
+      font-size: 0.8rem;
+      color: #4b5563;
+      margin-top: 6px;
+    }
+
+    /* Footer */
+    .footer-nav {
+      background: #ffffff;
+      border-top: 1px solid #eef2f6;
+      margin-top: 50px;
+      padding: 18px 20px 24px;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.02);
+    }
+    .footer-items {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      text-align: center;
+    }
+    .footer-item {
+      flex: 1;
+      min-width: 70px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #334155;
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .footer-item i {
+      font-size: 1.5rem;
+      color: #2c6e9e;
+      transition: 0.2s;
+    }
+    .footer-item:hover {
+      color: #f97316;
+      transform: translateY(-5px);
+    }
+    .footer-item:hover i {
+      color: #f97316;
+      transform: scale(1.1);
+    }
+    .copyright {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #94a3b8;
+      margin-top: 24px;
+    }
+
+    /* ========== MODAL / ANIMATED BOX FOR NAME ========== */
+    .name-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: visible;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+    .name-modal-overlay.hide {
+      opacity: 0;
+      visibility: hidden;
+      transition: visibility 0.3s, opacity 0.3s;
+    }
+    .name-modal {
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
+      border-radius: 36px;
+      max-width: 440px;
+      width: 90%;
+      padding: 32px 28px;
+      text-align: center;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
+      animation: modalBounceIn 0.5s cubic-bezier(0.34, 1.2, 0.64, 1);
+      transform-origin: center;
+    }
+    @keyframes modalBounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(-40px);
+      }
+      60% {
+        opacity: 1;
+        transform: scale(1.02) translateY(6px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+    .name-modal h3 {
+      font-size: 1.9rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1e3c72, #f97316);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 12px;
+    }
+    .name-modal p {
+      color: #475569;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+    .name-modal input {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 60px;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+      background: white;
+    }
+    .name-modal input:focus {
+      border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+    }
+    .name-modal button {
+      margin-top: 24px;
+      background: linear-gradient(95deg, #f97316, #ff914d);
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 60px;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s ease;
+      box-shadow: 0 8px 18px rgba(249, 115, 22, 0.3);
+    }
+    .name-modal button:hover {
+      transform: scale(1.02);
+      background: linear-gradient(95deg, #e2620e, #ff7a2c);
+      box-shadow: 0 10px 22px rgba(249, 115, 22, 0.4);
+    }
+    .modal-icon {
+      font-size: 3.2rem;
+      color: #f97316;
+      margin-bottom: 8px;
+    }
+    @media (max-width: 520px) {
+      .name-modal { padding: 24px 20px; }
+      .name-modal h3 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-header">
+  <div class="header-container container">
+    <div class="" onclick="window.location.href='/'">
+      <div class=""><i class=""></i></div>
+      <div class="logo-text"></div>
+    </div>
+    <div class="site-name">⚡ Triveni Pathsala ⚡</div>
+    <div class="" id="notificationBtn">
+      <i class=""></i>
+      <span class="notify-badge"></span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="welcome-strip">
+    <i class="fas fa-hand-peace"></i>
+    <span>नमस्ते, <span class="greeting-name" id="greetingUser">Sumit Verma</span> 👋</span>
+  </div>
+
+  <!-- SLIDER SECTION (kept functional, uses links) -->
+  <div class="slider-section">
+    <div class="slider-container">
+      <div class="slides-wrapper" id="slidesWrapper"></div>
+      <button class="slider-btn btn-prev" id="prevSlide"><i class="fas fa-chevron-left"></i></button>
+      <button class="slider-btn btn-next" id="nextSlide"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div class="dots" id="dotsContainer"></div>
+  </div>
+
+  <!-- 12 SECTIONS GRID WITH ANCHOR LINKS (CUSTOM REDIRECT SYSTEM) -->
+  <div>
+    <h2 class="section-title">📚 Explore Premium Resources</h2>
+    <div class="cards-grid" id="twelveSectionsGrid"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer-nav">
+  <div class="footer-items">
+    <div class="footer-item" data-link="/alpha-home"><i class="fas fa-home"></i><span>Home</span></div>
+    <div class="footer-item" data-link="/my-purchases"><i class="fas fa-shopping-bag"></i><span>My Purchases...</span></div>
+    
+    
+    <div class="footer-item" data-link="/chat-support"><i class="fas fa-comment-dots"></i><span>Chat</span></div>
+  </div>
+  <div class="copyright"></div>
+</div>
+
+<script>
+  // ==================== 1. NAME MODAL (ANIMATED BOX) ====================
+  function initNameModal() {
+    const storedName = localStorage.getItem('alphaStudentName');
+    const greetingSpan = document.getElementById('greetingUser');
+    
+    if (storedName && storedName.trim() !== "") {
+      if (greetingSpan) greetingSpan.innerText = storedName;
+      return;
+    }
+    
+    const modalOverlay = document.createElement('div');
+    modalOverlay.className = 'name-modal-overlay';
+    modalOverlay.innerHTML = `
+      <div class="name-modal">
+        <div class="modal-icon"><i class="fas fa-user-astronaut"></i></div>
+        <h3>Welcome, Future Achiever! 🚀</h3>
+        <p>Please tell us your name to personalize your learning journey</p>
+        <input type="text" id="studentNameInput" placeholder="e.g., your name" autocomplete="off">
+        <button id="submitNameBtn">Continue →</button>
+      </div>
+    `;
+    document.body.appendChild(modalOverlay);
+    
+    const inputField = document.getElementById('studentNameInput');
+    const submitBtn = document.getElementById('submitNameBtn');
+    
+    function saveAndClose() {
+      let enteredName = inputField.value.trim();
+      if (enteredName === "") enteredName = "Student";
+      if (greetingSpan) greetingSpan.innerText = enteredName;
+      localStorage.setItem('alphaStudentName', enteredName);
+      modalOverlay.classList.add('hide');
+      setTimeout(() => modalOverlay.remove(), 300);
+    }
+    
+    submitBtn.addEventListener('click', saveAndClose);
+    inputField.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveAndClose(); });
+    setTimeout(() => inputField.focus(), 100);
+  }
+
+  // ----------------------------- 2. SLIDER DATA & FUNCTIONALITY -----------------------------
+  const slidesData = [
+    { title: "Padhne ka sahi TARIKA", desc: "!", bg: "linear-gradient(120deg, #0b2b44, #1a4a6e)", btn: "Practice Now →", link: "/set-practice/5-pahar-method" },
+    
+    { title: "❌ No Book PDF • No Set Practice PDF", desc: "Only Smart Online Tests & Real Exam Simulator. Go green!", bg: "linear-gradient(140deg, #2c3e50, #3e5a6f)", btn: "Start Free Test →", link: "/free-test/smart-simulator" },
+    
+    { title: "📰 New Addmision is open", desc: "Stay updated ", bg: "linear-gradient(100deg, #14532d, #2b7a4b)", btn: "Read Now →", link: "/current-affairs/daily-quiz" },
+    { title: "📜 Previous Year Papers", desc: "10+ years solved papers for IIT-JEE", bg: "linear-gradient(118deg, #5b2e48, #8b4e6e)", btn: "Download PYQs →", link: "/pyq-bank/previous-papers" },
+    { title: "🎬 Free YouTube Classes", desc: "Expert guidance, tricks, live doubt sessions", bg: "linear-gradient(125deg, #aa2e4e, #c0395f)", btn: "Watch Now →", link: "/youtube/alpha-classes" },
+    { title: "🎯 Practice Smart, Score Better!", desc: "Adaptive learning & performance analytics", bg: "linear-gradient(135deg, #0f2b3d, #1e6f5c)", btn: "Boost Score →", link: "/smart-practice/boost" },
+    { title: "📚 All Exam Syllabus", desc: "", bg: "linear-gradient(145deg, #283b4c, #3a5e7a)", btn: "Check Syllabus →", link: "/syllabus/all-exams" },
+    { title: "⚡ Previous Year Papers", desc: "10+ years solved papers for NEET", bg: "linear-gradient(115deg, #4a2f2d, #7b4a3a)", btn: "Start Set Practice →", link: "/set-practice/50-mcq-challenge" }
+  ];
+
+  let currentIndex = 0;
+  let totalSlides = slidesData.length;
+  let slidesWrapper = document.getElementById('slidesWrapper');
+  let dotsContainer = document.getElementById('dotsContainer');
+  let autoInterval;
+
+  function buildSlides() {
+    slidesWrapper.innerHTML = '';
+    slidesData.forEach((slide) => {
+      const slideDiv = document.createElement('div');
+      slideDiv.className = 'slide';
+      slideDiv.style.background = slide.bg;
+      slideDiv.style.color = 'white';
+      slideDiv.setAttribute('data-slide-link', slide.link);
+      slideDiv.innerHTML = `
+        <h2>${slide.title}</h2>
+        <p>${slide.desc}</p>
+        <div class="btn-slide" data-link="${slide.link}">${slide.btn}</div>
+      `;
+      slidesWrapper.appendChild(slideDiv);
+    });
+    attachSlideRedirects();
+  }
+
+  function attachSlideRedirects() {
+    const slides = document.querySelectorAll('.slide');
+    slides.forEach(slide => {
+      slide.addEventListener('click', (e) => {
+        if (e.target.closest('.slider-btn') || e.target.closest('.dot')) return;
+        const link = slide.getAttribute('data-slide-link');
+        if (link) window.location.href = link;
+      });
+      const btn = slide.querySelector('.btn-slide');
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const link = btn.getAttribute('data-link');
+          if (link) window.location.href = link;
+        });
+      }
+    });
+  }
+
+  function createDots() {
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < totalSlides; i++) {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      if (i === currentIndex) dot.classList.add('active');
+      dot.addEventListener('click', () => goToSlide(i));
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  function updateDots() {
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach((dot, idx) => {
+      if (idx === currentIndex) dot.classList.add('active');
+      else dot.classList.remove('active');
+    });
+  }
+
+  function goToSlide(index) {
+    if (index < 0) index = totalSlides - 1;
+    if (index >= totalSlides) index = 0;
+    currentIndex = index;
+    const offset = -currentIndex * 100;
+    slidesWrapper.style.transform = `translateX(${offset}%)`;
+    updateDots();
+    resetAutoPlay();
+  }
+
+  function nextSlide() { goToSlide(currentIndex + 1); }
+  function prevSlide() { goToSlide(currentIndex - 1); }
+
+  function resetAutoPlay() {
+    if (autoInterval) clearInterval(autoInterval);
+    autoInterval = setInterval(() => { nextSlide(); }, 5000);
+  }
+
+  function initSlider() {
+    buildSlides();
+    createDots();
+    goToSlide(0);
+    document.getElementById('prevSlide').addEventListener('click', () => { prevSlide(); resetAutoPlay(); });
+    document.getElementById('nextSlide').addEventListener('click', () => { nextSlide(); resetAutoPlay(); });
+    resetAutoPlay();
+    const container = document.querySelector('.slider-container');
+    container.addEventListener('mouseenter', () => { if (autoInterval) clearInterval(autoInterval); });
+    container.addEventListener('mouseleave', () => { resetAutoPlay(); });
+  }
+
+  // ----------------------------- 3. 12 SECTIONS WITH ANCHOR LINKS (CUSTOM REDIRECT SYSTEM) -----------------------------
+  // 📌 UPDATE YOUR CUSTOM LINKS BELOW: each object has a "link" property.
+  //    Replace with your own URLs (internal or external). Keep structure for backend integration.
+  const sectionsData = [
+    { name: "Our Course", icon: "fas fa-chalkboard-user", desc: "Premium video courses", tag: "Popular", link: "./index.html" },
+    { name: "E-Books", icon: "fas fa-book-open", desc: "Digital study material", tag: "", link: "./index.html" },
+    
+    { name: "Student Admission", icon: "fas fa-clipboard-list", desc: "Fill out the admission form", tag: "", link: "./addmision.html" },
+   
+    { name: "Study Material", icon: "fas fa-file-pdf", desc: "Exam specific PDFs", tag: "", link: "./index.html" },
+    { name: "Students Details", icon: "fas fa-newspaper", desc: "Student information and updates", tag: "Daily", link: "./student.html" },
+    
+    { name: "Important Notification", icon: "fas fa-bullhorn", desc: "", tag: "New", link: "./index.html" },
+    { name: "Free YouTube Classes", icon: "fab fa-youtube", desc: "Live + recorded", tag: "Subscribe", link: "./index.html" },
+    
+    { name: "Fee Payment", icon: "fas fa-qrcode", desc: "Play & win coins", tag: "Interactive", link: "./payment.html" }
+  ];
+
+  function buildTwelveSections() {
+    const grid = document.getElementById('twelveSectionsGrid');
+    grid.innerHTML = '';
+    sectionsData.forEach((item, idx) => {
+      // Create anchor element with proper href (real link, no dummy JS)
+      const cardLink = document.createElement('a');
+      cardLink.className = 'resource-card card-animate';
+      // Use item.link as redirect URL – customize via sectionsData array
+      cardLink.href = item.link && item.link.trim() !== "" ? item.link : "#";
+      // For external links, keep default behavior; optionally add target if needed
+      // if (item.link.startsWith('http')) cardLink.setAttribute('rel', 'noopener noreferrer');
+      cardLink.style.animation = `fadeInUp 0.4s ease forwards`;
+      cardLink.style.animationDelay = `${idx * 0.03}s`;
+      
+      let tagHtml = item.tag ? `<div class="badge-new">${item.tag}</div>` : '';
+      cardLink.innerHTML = `
+        <div class="card-icon"><i class="${item.icon}"></i></div>
+        <h4>${item.name}</h4>
+        <p>${item.desc}</p>
+        ${tagHtml}
+      `;
+      grid.appendChild(cardLink);
+    });
+  }
+
+  // Footer custom redirects (kept functional)
+  function setupFooterRedirects() {
+    const footerItems = document.querySelectorAll('.footer-item');
+    const linksMap = {
+      'Home': '/alpha-home',
+      'My Purchases...': '/my-purchases',
+      'Downloads': '/downloads-offline',
+      'Live': '/live-sessions',
+      'Chat': '/chat-support'
+    };
+    footerItems.forEach(item => {
+      const spanText = item.querySelector('span')?.innerText;
+      const customLink = linksMap[spanText] || item.getAttribute('data-link') || '#';
+      item.addEventListener('click', () => {
+        window.location.href = customLink;
+      });
+    });
+  }
+
+  function setupNotification() {
+    const bellBtn = document.getElementById('notificationBtn');
+    bellBtn.addEventListener('click', () => {
+      alert("🔔 New: 5 Free Mocks added! • Special ₹00.00 Set Practice Pack • Live class at 8 PM");
+    });
+  }
+
+  // MAIN INIT
+  window.addEventListener('DOMContentLoaded', () => {
+    initNameModal();
+    initSlider();
+    buildTwelveSections();    // Generates <a> cards with custom redirect links
+    setupFooterRedirects();
+    setupNotification();
+  });
+</script>
+<!-- 
+  ✅ CUSTOM REDIRECT SYSTEM FULLY IMPLEMENTED:
+  - All 12 sections are now real anchor links (<a> tags) with href attributes.
+  - No dummy buttons or JavaScript redirects for these cards.
+  - Edit the 'sectionsData' array above to change each card's redirect URL.
+  - Each card's link can be internal (/path) or external (https://...).
+  - Scalable for backend: just modify the JSON array or fetch from API.
+-->
+</body>
+</html>
