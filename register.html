@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Triveni Pathsala · Fixed | Admin Single Month | UPI Request</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: linear-gradient(145deg, #f0f9ff 0%, #e6f0fa 100%); min-height: 100vh; padding: 1.2rem; }
+        .app-wrapper { max-width: 750px; margin: 0 auto; }
+        .glass-card { background: rgba(255,255,255,0.96); backdrop-filter: blur(4px); border-radius: 2rem; border: 1px solid rgba(100,116,139,0.2); box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { text-align: center; padding: 1.5rem 1rem 0.8rem; border-bottom: 1px solid #e2e8f0; background: #ffffffcc; }
+        .header h1 { font-size: 1.9rem; font-weight: 800; background: linear-gradient(135deg, #1e3a8a, #3b82f6, #06b6d4); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        .view { padding: 1.8rem; transition: 0.2s; }
+        .hidden { display: none; }
+        .input-group { margin-bottom: 1.2rem; }
+        .input-label { display: block; color: #1e293b; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem; }
+        .input-field, select { width: 100%; padding: 0.85rem 1rem; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 1.2rem; color: #0f172a; font-size: 0.9rem; outline: none; transition: all 0.2s; }
+        .input-field:focus, select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+        .btn { width: 100%; background: linear-gradient(105deg, #3b82f6, #2563eb); border: none; padding: 0.9rem; border-radius: 2rem; font-weight: 700; color: white; cursor: pointer; font-size: 1rem; transition: transform 0.2s, box-shadow 0.2s; }
+        .btn:active { transform: scale(0.97); }
+        .btn-outline { background: transparent; border: 1.5px solid #3b82f6; color: #1e40af; margin-top: 0.8rem; }
+        .btn-success { background: linear-gradient(105deg, #10b981, #059669); }
+        .feedback { margin-top: 1rem; padding: 0.7rem; background: #f1f5f9; border-radius: 1.2rem; text-align: center; font-size: 0.8rem; border-left: 4px solid #facc15; color: #92400e; animation: fadeSlide 0.4s ease; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .profile-card { background: #ffffff; border-radius: 1.5rem; padding: 1.2rem; margin-bottom: 1.2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .profile-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #3b82f6; background: #e2e8f0; }
+        .profile-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .stats-grid { display: flex; justify-content: space-between; gap: 0.6rem; margin: 1rem 0; flex-wrap: wrap; }
+        .stat-badge { background: #eef2ff; padding: 0.4rem 0.9rem; border-radius: 2rem; font-size: 0.75rem; font-weight: 600; color: #1e3a8a; }
+        .progress-bar { background: #e2e8f0; border-radius: 1rem; height: 8px; overflow: hidden; margin: 0.8rem 0; }
+        .progress-fill { background: linear-gradient(90deg, #22c55e, #16a34a); width: 0%; height: 100%; transition: width 0.6s cubic-bezier(0.22, 0.97, 0.36, 1.1); }
+        .months-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.8rem; margin: 1.2rem 0; }
+        .month-card { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 1.2rem; padding: 0.7rem; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .month-card.selected { border: 2px solid #facc15; background: #fef9e3; transform: scale(1.02); }
+        .month-card.paid { background: #dcfce7; border-color: #22c55e; cursor: default; opacity: 0.8; }
+        .month-card.due { background: #fee2e2; border-color: #ef4444; cursor: pointer; }
+        .admin-month-selector { background: #f8fafc; border-radius: 1.5rem; padding: 1.2rem; margin: 1rem 0; border: 1px solid #e2e8f0; }
+        .month-buttons { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.8rem; margin: 1rem 0; }
+        .month-select-btn { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 1rem; padding: 0.6rem; text-align: center; cursor: pointer; transition: 0.2s; font-weight: 500; }
+        .month-select-btn.selected-month { background: #3b82f6; color: white; border-color: #3b82f6; }
+        .month-select-btn.paid-month { background: #dcfce7; border-color: #22c55e; cursor: not-allowed; opacity: 0.6; }
+        .gateway-panel { background: white; border-radius: 2rem; padding: 1.5rem; color: #0f172a; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        .qr-box { background: #f8fafc; padding: 1rem; border-radius: 1.5rem; display: flex; justify-content: center; min-height: 200px; align-items: center; }
+        .upi-btn-sm { border-radius: 1rem; padding: 0.7rem; font-weight: 600; text-align: center; cursor: pointer; transition: 0.2s; }
+        .gpay-btn { background: linear-gradient(135deg,#1a73e8,#0d5bbf); color:white; }
+        .phonepe-btn { background: linear-gradient(135deg,#5f259f,#431d73); color:white; }
+        .paytm-btn { background: linear-gradient(135deg,#00b9f2,#0096c7); color:white; }
+        .photo-preview { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-top: 0.5rem; border: 2px solid #3b82f6; }
+        .animated-btn { transition: all 0.2s; }
+        .animated-btn:hover { transform: translateY(-2px); filter: brightness(1.02); }
+        .notification-badge { background: #fef9c3; border-left: 4px solid #eab308; padding: 0.5rem; border-radius: 1rem; margin-bottom: 1rem; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+<div class="app-wrapper">
+<div class="glass-card" id="mainApp">
+    <div class="header">
+        <h1>⚡ Triveni Pathsala ⚡</h1>
+        <p style="color:#334155;">Admin Single-Month Confirmation · UPI Request Only</p>
+    </div>
+
+    <!-- STUDENT LOGIN -->
+    <div id="loginView" class="view">
+        <div class="input-group"><label class="input-label">📘 Student ID</label><input type="text" id="loginId" class="input-field" placeholder="Your unique ID"></div>
+        <div class="input-group"><label class="input-label">🔒 Password</label><input type="password" id="loginPass" class="input-field" placeholder="Password"></div>
+        <button id="doLoginBtn" class="btn animated-btn">→ Student Login ←</button>
+        <button id="gotoRegisterBtn" class="btn-outline btn animated-btn">📝 New Student? Register</button>
+        <button id="gotoAdminLoginBtn" class="btn-outline btn animated-btn" style="border-color:#f59e0b; color:#b45309;">🔐 Admin Login</button>
+        <div id="loginFeedback" class="feedback">✨ Student: Request payment → Admin marks month PAID one by one.</div>
+    </div>
+
+    <!-- ADMIN LOGIN -->
+    <div id="adminLoginView" class="view hidden">
+        <h3 style="color:#1e293b;">🛡️ Admin Authentication</h3>
+        <div class="input-group"><label class="input-label">👤 Admin ID</label><input type="text" id="adminId" class="input-field" placeholder="Enter Admin ID"></div>
+        <div class="input-group"><label class="input-label">🔐 Admin Password</label><input type="password" id="adminPass" class="input-field" placeholder="Password"></div>
+        <button id="verifyAdminBtn" class="btn animated-btn">Verify & Enter</button>
+        <button id="backToLoginFromAdmin" class="btn-outline btn animated-btn">← Back</button>
+        <div id="adminLoginFeedback" class="feedback"></div>
+    </div>
+
+    <!-- ADMIN DASHBOARD - Single Month Selection -->
+    <div id="adminDashboardView" class="view hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="color:#1e293b;">🛠️ Admin - Mark Single Month as PAID</h3>
+            <button id="adminLogoutBtn" style="background:#ef4444; border:none; padding:0.3rem 1rem; border-radius:2rem; color:white;">Logout</button>
+        </div>
+        <select id="adminStudentSelect" class="input-field" style="margin:1rem 0;"></select>
+        <div id="adminMonthSelector" class="admin-month-selector">
+            <div style="font-weight:600; margin-bottom:0.5rem;">Select Month to Mark PAID:</div>
+            <div id="monthButtonsContainer" class="month-buttons"></div>
+            <button id="adminMarkPaidBtn" class="btn btn-success animated-btn" style="margin-top:1rem;">✅ Mark Selected Month as PAID & Notify Student</button>
+        </div>
+        <div id="adminFeedback" class="feedback"></div>
+    </div>
+
+    <!-- REGISTER VIEW -->
+    <div id="registerView" class="view hidden">
+        <div class="input-group"><label class="input-label">🆔 Student ID</label><input type="text" id="regId" class="input-field" placeholder="e.g., sumit2025"></div>
+        <div class="input-group"><label class="input-label">🔐 Password</label><input type="password" id="regPass" class="input-field" placeholder="min 4 characters"></div>
+        <div class="input-group"><label class="input-label">📛 Full Name</label><input type="text" id="regFullName" class="input-field" placeholder="e.g., Sumit Kumar"></div>
+        <div class="input-group"><label class="input-label">👨 Father's Name</label><input type="text" id="regFather" class="input-field" placeholder="Father's full name"></div>
+        <div class="input-group"><label class="input-label">📞 Phone Number</label><input type="text" id="regPhone" class="input-field" placeholder="+91 9876543210"></div>
+        <div class="input-group"><label class="input-label">📅 Admission Date</label><input type="date" id="regAdmissionDate" class="input-field"></div>
+        <div class="input-group"><label class="input-label">📸 Profile Photo (optional)</label><input type="file" id="regPhoto" accept="image/*" class="input-field" style="padding:0.5rem;"></div>
+        <div id="photoPreview" style="text-align:center; margin:0.5rem 0;"></div>
+        <div class="input-group"><label class="input-label">📚 Class</label>
+            <select id="regClass" class="input-field">
+                <option value="5">Class 5</option><option value="6">Class 6</option><option value="7">Class 7</option>
+                <option value="8">Class 8</option><option value="9">Class 9</option><option value="10">Class 10</option>
+                <option value="11">Class 11</option><option value="12">Class 12</option>
+                <option value="home_tuition">Home Tuition (Custom Fee)</option>
+            </select>
+        </div>
+        <div id="subjectsBlock" style="display:none;" class="input-group">
+            <label class="input-label">🧪 Subjects (Class 11/12) - ₹600 each</label>
+            <div style="display:flex; gap:1rem;">
+                <label><input type="checkbox" id="subjPhysics" value="Physics"> Physics</label>
+                <label><input type="checkbox" id="subjChemistry" value="Chemistry"> Chemistry</label>
+                <label><input type="checkbox" id="subjMaths" value="Maths"> Maths</label>
+            </div>
+        </div>
+        <div id="homeTuitionBlock" style="display:none;" class="input-group">
+            <label class="input-label">🏠 Home Tuition Monthly Fee (₹)</label>
+            <input type="number" id="homeTuitionFee" class="input-field" placeholder="Enter custom amount" value="1000">
+        </div>
+        <button id="doRegisterBtn" class="btn animated-btn">✅ Register</button>
+        <button id="gotoLoginFromReg" class="btn-outline btn animated-btn">← Back to Login</button>
+        <div id="regFeedback" class="feedback"></div>
+    </div>
+
+    <!-- STUDENT DASHBOARD -->
+    <div id="dashboardView" class="view hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="color:#1e293b;">📅 My Fee Portal</h3>
+            <button id="logoutDashBtn" style="background:#ef4444; border:none; padding:0.3rem 1rem; border-radius:2rem; color:white;">Logout</button>
+        </div>
+        <div id="notificationArea" class="notification-badge" style="display:none;"></div>
+        <div id="profileContainer" class="profile-card"></div>
+        <div class="stats-grid" id="statsContainer"></div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="months-grid" id="monthsGridContainer"></div>
+        <button id="paySelectedBtn" class="btn animated-btn">💳 Request Payment (UPI Gateway)</button>
+        <div id="dashFeedback" class="feedback">✅ Select a DUE month → Pay via UPI → Admin will mark PAID after verification</div>
+    </div>
+
+    <!-- PAYMENT GATEWAY (REQUEST ONLY, NO AUTO UPDATE) -->
+    <div id="gatewayView" class="view hidden">
+        <div class="gateway-panel">
+            <div style="display:flex; justify-content:space-between;">
+                <h2><i class="fas fa-credit-card"></i> UPI Payment Request</h2>
+                <button id="closeGatewayBtn" style="background:#ef4444; border:none; border-radius:2rem; padding:0.3rem 1rem; color:white;">✖</button>
+            </div>
+            <div id="gatewayStudentInfo" style="background:#f1f5f9; border-radius:1.2rem; padding:1rem; margin:1rem 0;"></div>
+            <div class="qr-box" id="qrcodeCanvas"></div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.8rem; margin:1rem 0;">
+                <button id="googlePayBtn" class="upi-btn-sm gpay-btn animated-btn"><i class="fab fa-google-pay"></i> GPay</button>
+                <button id="phonePeBtn" class="upi-btn-sm phonepe-btn animated-btn"><i class="fas fa-mobile-alt"></i> PhonePe</button>
+                <button id="paytmBtn" class="upi-btn-sm paytm-btn animated-btn"><i class="fab fa-paypal"></i> Paytm</button>
+            </div>
+            <button id="sendPaymentRequestBtn" class="btn animated-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);">📨 Send Payment Request to Admin</button>
+            <div id="gatewayFeedback" class="feedback"></div>
+            <p class="text-xs text-center text-gray-500 mt-2"><i class="fas fa-info-circle"></i> After UPI payment, click above to notify admin. Admin will mark month as PAID manually (one month at a time).</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    (function() {
+        // ======================= CONFIG =======================
+        const STORAGE_KEY = "triveni_single_month_admin_fixed";
+        const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+        const ADMIN_WHATSAPP = "916202320527";      // CHANGE to your WhatsApp number (without +)
+        const MERCHANT_UPI_ID = "sumitverma00368@okaxis";  // YOUR UPI ID
+        const ADMIN_ID = "Anand kumar";
+        const ADMIN_PASS = "Anand@2000";
+
+        // Helper: calculate monthly fee
+        function calculateMonthlyFee(student) {
+            if (!student) return 600;
+            const cls = student.class;
+            if (cls === "home_tuition") return Number(student.customFee) || 1000;
+            const classNum = parseInt(cls);
+            if (classNum >= 5 && classNum <= 8) return 600;
+            if (classNum === 9 || classNum === 10) return 1000;
+            if (classNum === 11 || classNum === 12) {
+                let subjects = student.subjects || [];
+                return subjects.length * 600;
+            }
+            return 600;
+        }
+
+        // Load / Save
+        function loadStudents() { 
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY); 
+                return raw ? JSON.parse(raw) : []; 
+            } catch(e) { return []; }
+        }
+        function saveStudents(students) { 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(students)); 
+        }
+
+        // Register
+        function registerStudent(data) {
+            let students = loadStudents();
+            if (students.find(s => s.id.toLowerCase() === data.id.toLowerCase())) return { success: false, msg: "Student ID already exists!" };
+            if (!data.id.trim() || data.password.length < 3 || !data.fullName.trim() || !data.fatherName.trim()) {
+                return { success: false, msg: "Please fill all required fields (ID, password, name, father name)." };
+            }
+            const newStudent = {
+                id: data.id.trim(),
+                password: data.password.trim(),
+                fullName: data.fullName.trim(),
+                fatherName: data.fatherName.trim(),
+                phone: data.phone.trim() || "Not provided",
+                class: data.class,
+                subjects: data.subjects || [],
+                customFee: data.customFee || null,
+                photoBase64: data.photoBase64 || "",
+                admissionDate: data.admissionDate || new Date().toISOString().split('T')[0],
+                feeStatus: new Array(12).fill(false),
+                notification: null,
+                registrationDate: new Date().toISOString()
+            };
+            students.push(newStudent);
+            saveStudents(students);
+            return { success: true, msg: "Registration successful! Please login." };
+        }
+
+        function authenticate(id, pwd) {
+            const students = loadStudents();
+            const student = students.find(s => s.id.toLowerCase() === id.toLowerCase() && s.password === pwd);
+            return student ? { success: true, student: JSON.parse(JSON.stringify(student)) } : { success: false, msg: "Invalid credentials" };
+        }
+
+        // Admin: mark single month as paid
+        function adminMarkSingleMonthPaid(studentId, monthIndex, notifyMsg) {
+            let students = loadStudents();
+            const idx = students.findIndex(s => s.id.toLowerCase() === studentId.toLowerCase());
+            if (idx === -1) return false;
+            if (students[idx].feeStatus[monthIndex] === true) return false;
+            students[idx].feeStatus[monthIndex] = true;
+            if (notifyMsg) students[idx].notification = notifyMsg;
+            saveStudents(students);
+            return true;
+        }
+
+        function getStudentStats(student) {
+            const monthly = calculateMonthlyFee(student);
+            const paidCount = student.feeStatus.filter(v=>v===true).length;
+            const dueCount = 12 - paidCount;
+            const totalDue = dueCount * monthly;
+            return { paidCount, dueCount, totalDue, monthlyFee: monthly, percent: (paidCount/12)*100 };
+        }
+
+        // UI variables
+        let currentStudent = null;
+        let selectedMonth = null;
+        let pendingRequestStudentId = null, pendingRequestMonth = null;
+
+        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;});}
+
+        // Render student dashboard
+        function renderDashboard() {
+            if (!currentStudent) return;
+            const freshStudents = loadStudents();
+            const fresh = freshStudents.find(s => s.id.toLowerCase() === currentStudent.id.toLowerCase());
+            if (!fresh) { currentStudent = null; showView('loginView'); return; }
+            currentStudent = fresh;
+            const stats = getStudentStats(currentStudent);
+            const photoHtml = currentStudent.photoBase64 ? `<img src="${currentStudent.photoBase64}" class="profile-photo" alt="photo">` : `<div class="profile-photo" style="background:#cbd5e1; display:flex;align-items:center;justify-content:center; font-size:2rem;">👤</div>`;
+            document.getElementById('profileContainer').innerHTML = `
+                <div class="profile-row">
+                    ${photoHtml}
+                    <div><h2 style="color:#0f172a;">${escapeHtml(currentStudent.fullName)}</h2>
+                    <p style="color:#334155;">👨 Father: ${escapeHtml(currentStudent.fatherName)} &nbsp;|&nbsp; 📞 ${currentStudent.phone}</p>
+                    <p style="color:#334155;">📚 Class: ${currentStudent.class === 'home_tuition' ? 'Home Tuition' : currentStudent.class} &nbsp;|&nbsp; 📅 Admission: ${currentStudent.admissionDate || 'N/A'}</p>
+                    <p style="color:#334155;">💰 Monthly Fee: ₹${stats.monthlyFee}</p></div>
+                </div>
+            `;
+            document.getElementById('statsContainer').innerHTML = `
+                <div class="stat-badge"><i class="fas fa-check-circle"></i> Paid: ${stats.paidCount}/12</div>
+                <div class="stat-badge"><i class="fas fa-rupee-sign"></i> Dues: ₹${stats.totalDue}</div>
+                <div class="stat-badge"><i class="fas fa-calendar"></i> Monthly: ₹${stats.monthlyFee}</div>
+            `;
+            document.getElementById('progressFill').style.width = `${stats.percent}%`;
+            let monthsHtml = '';
+            for (let i=0; i<12; i++) {
+                const isPaid = currentStudent.feeStatus[i];
+                let cls = isPaid ? 'paid' : 'due';
+                if (selectedMonth === i && !isPaid) cls += ' selected';
+                monthsHtml += `<div class="month-card ${cls}" data-midx="${i}"><div class="month-name"><strong>${MONTHS[i]}</strong></div><div>₹${stats.monthlyFee}</div><div style="font-size:0.65rem;">${isPaid ? '✅ PAID' : '⚠️ DUE'}</div></div>`;
+            }
+            document.getElementById('monthsGridContainer').innerHTML = monthsHtml;
+            document.querySelectorAll('.month-card.due[data-midx]').forEach(card => {
+                const idx = parseInt(card.getAttribute('data-midx'));
+                card.addEventListener('click', () => { selectedMonth = idx; renderDashboard(); document.getElementById('dashFeedback').innerHTML = `📌 Selected ${MONTHS[idx]} (₹${stats.monthlyFee})`; });
+            });
+            // Show notification
+            const notifDiv = document.getElementById('notificationArea');
+            if (currentStudent.notification) {
+                notifDiv.style.display = 'block';
+                notifDiv.innerHTML = `<i class="fas fa-bell"></i> ${escapeHtml(currentStudent.notification)}`;
+                let students = loadStudents();
+                const idx = students.findIndex(s => s.id.toLowerCase() === currentStudent.id.toLowerCase());
+                if (idx !== -1) { students[idx].notification = null; saveStudents(students); currentStudent.notification = null; }
+            } else { notifDiv.style.display = 'none'; }
+        }
+
+        // Payment request gateway (NO AUTO PAID)
+        function openPaymentRequest(monthIdx) {
+            if (!currentStudent || currentStudent.feeStatus[monthIdx]) return false;
+            const monthly = getStudentStats(currentStudent).monthlyFee;
+            pendingRequestStudentId = currentStudent.id;
+            pendingRequestMonth = monthIdx;
+            document.getElementById('gatewayStudentInfo').innerHTML = `<p><strong>${escapeHtml(currentStudent.fullName)}</strong> (${currentStudent.id})<br>📆 ${MONTHS[monthIdx]} · Amount: ₹${monthly}</p>`;
+            const upiString = `upi://pay?pa=${encodeURIComponent(MERCHANT_UPI_ID)}&pn=TriveniPathsala&am=${monthly.toFixed(2)}&cu=INR`;
+            const qrDiv = document.getElementById('qrcodeCanvas');
+            qrDiv.innerHTML = '';
+            try {
+                new QRCode(qrDiv, { text: upiString, width: 180, height: 180, colorDark: "#0f172a", colorLight: "#ffffff" });
+            } catch(e) {
+                qrDiv.innerHTML = '<div class="text-red-500">QR generation failed, but you can still use UPI buttons.</div>';
+            }
+            document.getElementById('gatewayFeedback').innerHTML = "🔹 Scan QR & pay. Then click 'Send Payment Request' to notify admin.";
+            showView('gatewayView');
+            return true;
+        }
+
+        function sendPaymentRequestToAdmin() {
+            if (!pendingRequestStudentId || pendingRequestMonth === null) { alert("No active payment request"); return; }
+            const students = loadStudents();
+            const studentObj = students.find(s => s.id.toLowerCase() === pendingRequestStudentId.toLowerCase());
+            if (!studentObj) return;
+            const monthName = MONTHS[pendingRequestMonth];
+            const amount = calculateMonthlyFee(studentObj);
+            const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+            const message = `💰 *PAYMENT REQUEST* 💰\n\n🏫 Triveni Pathsala\n👤 Student: ${studentObj.fullName}\n🆔 ID: ${studentObj.id}\n👨 Father: ${studentObj.fatherName}\n📞 Phone: ${studentObj.phone}\n📆 Month: ${monthName}\n💸 Amount: ₹${amount}\n🕒 Request Time: ${timestamp}\n\n✅ Please verify UPI payment and mark month as PAID in admin panel (single month selection).`;
+            const waLink = `https://wa.me/${ADMIN_WHATSAPP.replace(/^\+/, '')}?text=${encodeURIComponent(message)}`;
+            window.open(waLink, '_blank');
+            document.getElementById('gatewayFeedback').innerHTML = `✅ Request sent to admin for ${monthName}. Admin will mark PAID after verification.`;
+            setTimeout(() => {
+                if (currentStudent) { renderDashboard(); showView('dashboardView'); }
+                else showView('loginView');
+                pendingRequestStudentId = null; pendingRequestMonth = null;
+            }, 2000);
+        }
+
+        function redirectToUPI() {
+            if (!pendingRequestStudentId || pendingRequestMonth === null) { alert("No active session"); return; }
+            const students = loadStudents();
+            const studentObj = students.find(s => s.id.toLowerCase() === pendingRequestStudentId.toLowerCase());
+            if (!studentObj) return;
+            const amount = calculateMonthlyFee(studentObj);
+            const link = `upi://pay?pa=${encodeURIComponent(MERCHANT_UPI_ID)}&pn=TriveniPathsala&am=${amount.toFixed(2)}&cu=INR`;
+            window.location.href = link;
+            setTimeout(() => alert("If app doesn't open, install UPI app"), 800);
+        }
+
+        function showView(viewId) {
+            const views = ['loginView','adminLoginView','adminDashboardView','registerView','dashboardView','gatewayView'];
+            views.forEach(v => document.getElementById(v).classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        // Admin panel: single month selection UI
+        let currentAdminStudentId = null;
+        let selectedAdminMonth = null;
+
+        function renderAdminMonthSelector(studentId) {
+            const students = loadStudents();
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            currentAdminStudentId = studentId;
+            const monthly = calculateMonthlyFee(student);
+            const container = document.getElementById('monthButtonsContainer');
+            let html = '';
+            for (let i=0; i<12; i++) {
+                const isPaid = student.feeStatus[i];
+                const isSelected = (selectedAdminMonth === i);
+                let btnClass = 'month-select-btn';
+                if (isPaid) btnClass += ' paid-month';
+                if (isSelected && !isPaid) btnClass += ' selected-month';
+                html += `<div class="${btnClass}" data-month="${i}">
+                            <strong>${MONTHS[i]}</strong><br>
+                            <span style="font-size:0.7rem;">₹${monthly}</span><br>
+                            <span>${isPaid ? 'PAID' : 'DUE'}</span>
+                         </div>`;
+            }
+            container.innerHTML = html;
+            document.querySelectorAll('.month-select-btn:not(.paid-month)').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.getAttribute('data-month'));
+                    selectedAdminMonth = idx;
+                    renderAdminMonthSelector(currentAdminStudentId);
+                });
+            });
+        }
+
+        function renderAdminPanel() {
+            const students = loadStudents();
+            const select = document.getElementById('adminStudentSelect');
+            select.innerHTML = '';
+            students.forEach(s => { let opt = document.createElement('option'); opt.value = s.id; opt.textContent = `${s.id} - ${s.fullName}`; select.appendChild(opt); });
+            if (students.length) {
+                currentAdminStudentId = students[0].id;
+                selectedAdminMonth = null;
+                renderAdminMonthSelector(students[0].id);
+            }
+            select.onchange = () => {
+                currentAdminStudentId = select.value;
+                selectedAdminMonth = null;
+                renderAdminMonthSelector(currentAdminStudentId);
+            };
+        }
+
+        // ========== EVENT LISTENERS ==========
+        document.getElementById('doLoginBtn').onclick = () => {
+            const id = document.getElementById('loginId').value.trim();
+            const pwd = document.getElementById('loginPass').value.trim();
+            const auth = authenticate(id, pwd);
+            if (auth.success) { currentStudent = auth.student; selectedMonth = null; renderDashboard(); showView('dashboardView'); }
+            else document.getElementById('loginFeedback').innerHTML = `⚠️ ${auth.msg}`;
+        };
+        document.getElementById('gotoRegisterBtn').onclick = () => showView('registerView');
+        document.getElementById('gotoLoginFromReg').onclick = () => showView('loginView');
+        document.getElementById('logoutDashBtn').onclick = () => { currentStudent = null; showView('loginView'); };
+        document.getElementById('paySelectedBtn').onclick = () => { if(selectedMonth !== null && currentStudent && !currentStudent.feeStatus[selectedMonth]) openPaymentRequest(selectedMonth); else document.getElementById('dashFeedback').innerHTML = "❌ Select a DUE month first."; };
+        document.getElementById('closeGatewayBtn').onclick = () => { if(currentStudent) { renderDashboard(); showView('dashboardView'); } else showView('loginView'); };
+        document.getElementById('sendPaymentRequestBtn').onclick = sendPaymentRequestToAdmin;
+        document.getElementById('googlePayBtn').onclick = redirectToUPI;
+        document.getElementById('phonePeBtn').onclick = redirectToUPI;
+        document.getElementById('paytmBtn').onclick = redirectToUPI;
+
+        // Admin login
+        document.getElementById('gotoAdminLoginBtn').onclick = () => showView('adminLoginView');
+        document.getElementById('backToLoginFromAdmin').onclick = () => showView('loginView');
+        document.getElementById('verifyAdminBtn').onclick = () => {
+            const id = document.getElementById('adminId').value.trim();
+            const pwd = document.getElementById('adminPass').value.trim();
+            if (id === ADMIN_ID && pwd === ADMIN_PASS) {
+                renderAdminPanel();
+                showView('adminDashboardView');
+                document.getElementById('adminFeedback').innerHTML = "Admin: Select a student, then choose a DUE month and click 'Mark as PAID'.";
+            } else {
+                document.getElementById('adminLoginFeedback').innerHTML = "❌ Invalid Admin ID or Password.";
+            }
+        };
+        document.getElementById('adminLogoutBtn').onclick = () => showView('loginView');
+        document.getElementById('adminMarkPaidBtn').onclick = () => {
+            if (!currentAdminStudentId || selectedAdminMonth === null) {
+                document.getElementById('adminFeedback').innerHTML = "❌ Please select a student and a month first.";
+                return;
+            }
+            const students = loadStudents();
+            const student = students.find(s => s.id === currentAdminStudentId);
+            if (!student) return;
+            if (student.feeStatus[selectedAdminMonth]) {
+                document.getElementById('adminFeedback').innerHTML = "❌ This month is already PAID.";
+                return;
+            }
+            const monthName = MONTHS[selectedAdminMonth];
+            const notifyMsg = `🔔 Admin marked ${monthName} as PAID on ${new Date().toLocaleString()}. Thank you!`;
+            const success = adminMarkSingleMonthPaid(currentAdminStudentId, selectedAdminMonth, notifyMsg);
+            if (success) {
+                document.getElementById('adminFeedback').innerHTML = `✅ ${monthName} marked as PAID for ${student.fullName}. Notification sent.`;
+                selectedAdminMonth = null;
+                renderAdminMonthSelector(currentAdminStudentId);
+                if (currentStudent && currentStudent.id === currentAdminStudentId) {
+                    currentStudent = loadStudents().find(s => s.id === currentAdminStudentId);
+                    renderDashboard();
+                }
+            } else {
+                document.getElementById('adminFeedback').innerHTML = "❌ Failed to update. Month may already be paid.";
+            }
+        };
+
+        // Registration logic
+        document.getElementById('regClass').addEventListener('change', function() {
+            const val = this.value;
+            document.getElementById('subjectsBlock').style.display = (val === '11' || val === '12') ? 'block' : 'none';
+            document.getElementById('homeTuitionBlock').style.display = (val === 'home_tuition') ? 'block' : 'none';
+        });
+        window.photoBase64 = "";
+        document.getElementById('regPhoto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) { 
+                    document.getElementById('photoPreview').innerHTML = `<img src="${ev.target.result}" class="photo-preview">`; 
+                    window.photoBase64 = ev.target.result; 
+                };
+                reader.readAsDataURL(file);
+            } else { document.getElementById('photoPreview').innerHTML = ''; window.photoBase64 = ''; }
+        });
+        document.getElementById('doRegisterBtn').onclick = () => {
+            const id = document.getElementById('regId').value.trim();
+            const pass = document.getElementById('regPass').value.trim();
+            const fullName = document.getElementById('regFullName').value.trim();
+            const father = document.getElementById('regFather').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const admissionDate = document.getElementById('regAdmissionDate').value;
+            const classVal = document.getElementById('regClass').value;
+            let subjects = [];
+            if (classVal === '11' || classVal === '12') {
+                if(document.getElementById('subjPhysics').checked) subjects.push('Physics');
+                if(document.getElementById('subjChemistry').checked) subjects.push('Chemistry');
+                if(document.getElementById('subjMaths').checked) subjects.push('Maths');
+                if(subjects.length === 0) { alert("Select at least one subject for 11/12"); return; }
+            }
+            let customFee = null;
+            if(classVal === 'home_tuition') customFee = parseFloat(document.getElementById('homeTuitionFee').value);
+            if(!id || pass.length<3 || !fullName || !father) { alert("Fill all required fields (ID, password, name, father)"); return; }
+            const photo = window.photoBase64 || "";
+            const res = registerStudent({ id, password: pass, fullName, fatherName: father, phone, class: classVal, subjects, customFee, photoBase64: photo, admissionDate });
+            document.getElementById('regFeedback').innerHTML = res.msg;
+            if(res.success) setTimeout(() => showView('loginView'), 1500);
+        };
+
+        // Seed demo student if empty
+        if(loadStudents().length === 0) {
+            let demo = { id:"sumit", password:"1234", fullName:"Sumit Kumar", fatherName:"Ramesh Kumar", phone:"9876543210", class:"11", subjects:["Physics","Maths"], customFee:null, photoBase64:"", admissionDate:"2024-04-01", feeStatus:[true,true,false,false,false,false,false,false,false,false,false,false], notification: null };
+            saveStudents([demo]);
+        }
+        showView('loginView');
+    })();
+</script>
+</body>
+</html>
