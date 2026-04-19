@@ -3,11 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>Triveni Pathsala · Fixed | Admin Single Month | UPI Request</title>
+    <title>Triveni Pathsala · Firebase | Admin Single Month | UPI Request</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    
+    <!-- Firebase Compat SDKs (Realtime Database) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
+        /* (All your existing CSS remains exactly the same) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: linear-gradient(145deg, #f0f9ff 0%, #e6f0fa 100%); min-height: 100vh; padding: 1.2rem; }
         .app-wrapper { max-width: 750px; margin: 0 auto; }
@@ -53,6 +59,8 @@
         .animated-btn { transition: all 0.2s; }
         .animated-btn:hover { transform: translateY(-2px); filter: brightness(1.02); }
         .notification-badge { background: #fef9c3; border-left: 4px solid #eab308; padding: 0.5rem; border-radius: 1rem; margin-bottom: 1rem; font-size: 0.8rem; }
+        .loading-spinner { display: inline-block; width: 1rem; height: 1rem; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -60,7 +68,7 @@
 <div class="glass-card" id="mainApp">
     <div class="header">
         <h1>⚡ Triveni Pathsala ⚡</h1>
-        <p style="color:#334155;">Admin Single-Month Confirmation · UPI Request Only</p>
+        <p style="color:#334155;"></p>
     </div>
 
     <!-- STUDENT LOGIN -->
@@ -173,14 +181,29 @@
 <script>
     (function() {
         // ======================= CONFIG =======================
-        const STORAGE_KEY = "triveni_single_month_admin_fixed";
         const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
         const ADMIN_WHATSAPP = "916202320527";      // CHANGE to your WhatsApp number (without +)
         const MERCHANT_UPI_ID = "sumitverma00368@okaxis";  // YOUR UPI ID
         const ADMIN_ID = "Anand kumar";
         const ADMIN_PASS = "Anand@2000";
 
-        // Helper: calculate monthly fee
+        // -------------------- Firebase Initialization --------------------
+        const firebaseConfig = {
+            apiKey: "AIzaSyBeZl52HEWGz-vE72QZ5taznvpYTfq3QUk",
+            authDomain: "login-and-reg-5728d.firebaseapp.com",
+            databaseURL: "https://login-and-reg-5728d-default-rtdb.firebaseio.com",
+            projectId: "login-and-reg-5728d",
+            storageBucket: "login-and-reg-5728d.firebasestorage.app",
+            messagingSenderId: "435846403197",
+            appId: "1:435846403197:web:d6a05a55e40839d15dcd14"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const studentsRef = database.ref('students');
+
+        // Helper: calculate monthly fee (unchanged)
         function calculateMonthlyFee(student) {
             if (!student) return 600;
             const cls = student.class;
@@ -195,60 +218,103 @@
             return 600;
         }
 
-        // Load / Save
-        function loadStudents() { 
+        // ========== Firebase CRUD Functions ==========
+        async function loadStudents() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEY); 
-                return raw ? JSON.parse(raw) : []; 
-            } catch(e) { return []; }
-        }
-        function saveStudents(students) { 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(students)); 
-        }
-
-        // Register
-        function registerStudent(data) {
-            let students = loadStudents();
-            if (students.find(s => s.id.toLowerCase() === data.id.toLowerCase())) return { success: false, msg: "Student ID already exists!" };
-            if (!data.id.trim() || data.password.length < 3 || !data.fullName.trim() || !data.fatherName.trim()) {
-                return { success: false, msg: "Please fill all required fields (ID, password, name, father name)." };
+                const snapshot = await studentsRef.once('value');
+                const data = snapshot.val();
+                if (!data) return [];
+                // Convert object to array
+                return Object.values(data);
+            } catch (error) {
+                console.error("Error loading students:", error);
+                return [];
             }
-            const newStudent = {
-                id: data.id.trim(),
-                password: data.password.trim(),
-                fullName: data.fullName.trim(),
-                fatherName: data.fatherName.trim(),
-                phone: data.phone.trim() || "Not provided",
-                class: data.class,
-                subjects: data.subjects || [],
-                customFee: data.customFee || null,
-                photoBase64: data.photoBase64 || "",
-                admissionDate: data.admissionDate || new Date().toISOString().split('T')[0],
-                feeStatus: new Array(12).fill(false),
-                notification: null,
-                registrationDate: new Date().toISOString()
-            };
-            students.push(newStudent);
-            saveStudents(students);
-            return { success: true, msg: "Registration successful! Please login." };
         }
 
-        function authenticate(id, pwd) {
-            const students = loadStudents();
-            const student = students.find(s => s.id.toLowerCase() === id.toLowerCase() && s.password === pwd);
-            return student ? { success: true, student: JSON.parse(JSON.stringify(student)) } : { success: false, msg: "Invalid credentials" };
+        async function saveStudent(student) {
+            try {
+                // Use student.id as the key
+                await studentsRef.child(student.id).set(student);
+                return true;
+            } catch (error) {
+                console.error("Error saving student:", error);
+                return false;
+            }
         }
 
-        // Admin: mark single month as paid
-        function adminMarkSingleMonthPaid(studentId, monthIndex, notifyMsg) {
-            let students = loadStudents();
-            const idx = students.findIndex(s => s.id.toLowerCase() === studentId.toLowerCase());
-            if (idx === -1) return false;
-            if (students[idx].feeStatus[monthIndex] === true) return false;
-            students[idx].feeStatus[monthIndex] = true;
-            if (notifyMsg) students[idx].notification = notifyMsg;
-            saveStudents(students);
-            return true;
+        async function updateFeeStatus(studentId, monthIndex, status, notificationMsg = null) {
+            try {
+                const updates = {};
+                updates[`feeStatus/${monthIndex}`] = status;
+                if (notificationMsg) updates['notification'] = notificationMsg;
+                await studentsRef.child(studentId).update(updates);
+                return true;
+            } catch (error) {
+                console.error("Error updating fee status:", error);
+                return false;
+            }
+        }
+
+        async function registerStudent(data) {
+            try {
+                const students = await loadStudents();
+                if (students.find(s => s.id.toLowerCase() === data.id.toLowerCase())) {
+                    return { success: false, msg: "Student ID already exists!" };
+                }
+                if (!data.id.trim() || data.password.length < 3 || !data.fullName.trim() || !data.fatherName.trim()) {
+                    return { success: false, msg: "Please fill all required fields (ID, password, name, father name)." };
+                }
+                const newStudent = {
+                    id: data.id.trim(),
+                    password: data.password.trim(),
+                    fullName: data.fullName.trim(),
+                    fatherName: data.fatherName.trim(),
+                    phone: data.phone.trim() || "Not provided",
+                    class: data.class,
+                    subjects: data.subjects || [],
+                    customFee: data.customFee || null,
+                    photoBase64: data.photoBase64 || "",
+                    admissionDate: data.admissionDate || new Date().toISOString().split('T')[0],
+                    feeStatus: new Array(12).fill(false),
+                    notification: null,
+                    registrationDate: new Date().toISOString()
+                };
+                const success = await saveStudent(newStudent);
+                if (success) {
+                    return { success: true, msg: "Registration successful! Please login." };
+                } else {
+                    return { success: false, msg: "Failed to save student. Please try again." };
+                }
+            } catch (error) {
+                console.error(error);
+                return { success: false, msg: "An error occurred during registration." };
+            }
+        }
+
+        async function authenticate(id, pwd) {
+            try {
+                const students = await loadStudents();
+                const student = students.find(s => s.id.toLowerCase() === id.toLowerCase() && s.password === pwd);
+                return student ? { success: true, student: JSON.parse(JSON.stringify(student)) } : { success: false, msg: "Invalid credentials" };
+            } catch (error) {
+                return { success: false, msg: "Authentication error. Please try again." };
+            }
+        }
+
+        async function adminMarkSingleMonthPaid(studentId, monthIndex, notifyMsg) {
+            try {
+                const snapshot = await studentsRef.child(studentId).once('value');
+                const student = snapshot.val();
+                if (!student) return false;
+                if (student.feeStatus && student.feeStatus[monthIndex] === true) return false;
+                
+                const success = await updateFeeStatus(studentId, monthIndex, true, notifyMsg);
+                return success;
+            } catch (error) {
+                console.error(error);
+                return false;
+            }
         }
 
         function getStudentStats(student) {
@@ -266,54 +332,75 @@
 
         function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;});}
 
-        // Render student dashboard
-        function renderDashboard() {
+        // Render student dashboard (now async to fetch fresh data)
+        async function renderDashboard() {
             if (!currentStudent) return;
-            const freshStudents = loadStudents();
-            const fresh = freshStudents.find(s => s.id.toLowerCase() === currentStudent.id.toLowerCase());
-            if (!fresh) { currentStudent = null; showView('loginView'); return; }
-            currentStudent = fresh;
-            const stats = getStudentStats(currentStudent);
-            const photoHtml = currentStudent.photoBase64 ? `<img src="${currentStudent.photoBase64}" class="profile-photo" alt="photo">` : `<div class="profile-photo" style="background:#cbd5e1; display:flex;align-items:center;justify-content:center; font-size:2rem;">👤</div>`;
-            document.getElementById('profileContainer').innerHTML = `
-                <div class="profile-row">
-                    ${photoHtml}
-                    <div><h2 style="color:#0f172a;">${escapeHtml(currentStudent.fullName)}</h2>
-                    <p style="color:#334155;">👨 Father: ${escapeHtml(currentStudent.fatherName)} &nbsp;|&nbsp; 📞 ${currentStudent.phone}</p>
-                    <p style="color:#334155;">📚 Class: ${currentStudent.class === 'home_tuition' ? 'Home Tuition' : currentStudent.class} &nbsp;|&nbsp; 📅 Admission: ${currentStudent.admissionDate || 'N/A'}</p>
-                    <p style="color:#334155;">💰 Monthly Fee: ₹${stats.monthlyFee}</p></div>
-                </div>
-            `;
-            document.getElementById('statsContainer').innerHTML = `
-                <div class="stat-badge"><i class="fas fa-check-circle"></i> Paid: ${stats.paidCount}/12</div>
-                <div class="stat-badge"><i class="fas fa-rupee-sign"></i> Dues: ₹${stats.totalDue}</div>
-                <div class="stat-badge"><i class="fas fa-calendar"></i> Monthly: ₹${stats.monthlyFee}</div>
-            `;
-            document.getElementById('progressFill').style.width = `${stats.percent}%`;
-            let monthsHtml = '';
-            for (let i=0; i<12; i++) {
-                const isPaid = currentStudent.feeStatus[i];
-                let cls = isPaid ? 'paid' : 'due';
-                if (selectedMonth === i && !isPaid) cls += ' selected';
-                monthsHtml += `<div class="month-card ${cls}" data-midx="${i}"><div class="month-name"><strong>${MONTHS[i]}</strong></div><div>₹${stats.monthlyFee}</div><div style="font-size:0.65rem;">${isPaid ? '✅ PAID' : '⚠️ DUE'}</div></div>`;
+            try {
+                // Reload fresh data from Firebase
+                const snapshot = await studentsRef.child(currentStudent.id).once('value');
+                const fresh = snapshot.val();
+                if (!fresh) { 
+                    currentStudent = null; 
+                    showView('loginView'); 
+                    return; 
+                }
+                currentStudent = fresh;
+                
+                const stats = getStudentStats(currentStudent);
+                const photoHtml = currentStudent.photoBase64 ? 
+                    `<img src="${currentStudent.photoBase64}" class="profile-photo" alt="photo">` : 
+                    `<div class="profile-photo" style="background:#cbd5e1; display:flex;align-items:center;justify-content:center; font-size:2rem;">👤</div>`;
+                
+                document.getElementById('profileContainer').innerHTML = `
+                    <div class="profile-row">
+                        ${photoHtml}
+                        <div><h2 style="color:#0f172a;">${escapeHtml(currentStudent.fullName)}</h2>
+                        <p style="color:#334155;">👨 Father: ${escapeHtml(currentStudent.fatherName)} &nbsp;|&nbsp; 📞 ${currentStudent.phone}</p>
+                        <p style="color:#334155;">📚 Class: ${currentStudent.class === 'home_tuition' ? 'Home Tuition' : currentStudent.class} &nbsp;|&nbsp; 📅 Admission: ${currentStudent.admissionDate || 'N/A'}</p>
+                        <p style="color:#334155;">💰 Monthly Fee: ₹${stats.monthlyFee}</p></div>
+                    </div>
+                `;
+                document.getElementById('statsContainer').innerHTML = `
+                    <div class="stat-badge"><i class="fas fa-check-circle"></i> Paid: ${stats.paidCount}/12</div>
+                    <div class="stat-badge"><i class="fas fa-rupee-sign"></i> Dues: ₹${stats.totalDue}</div>
+                    <div class="stat-badge"><i class="fas fa-calendar"></i> Monthly: ₹${stats.monthlyFee}</div>
+                `;
+                document.getElementById('progressFill').style.width = `${stats.percent}%`;
+                
+                let monthsHtml = '';
+                for (let i=0; i<12; i++) {
+                    const isPaid = currentStudent.feeStatus[i];
+                    let cls = isPaid ? 'paid' : 'due';
+                    if (selectedMonth === i && !isPaid) cls += ' selected';
+                    monthsHtml += `<div class="month-card ${cls}" data-midx="${i}"><div class="month-name"><strong>${MONTHS[i]}</strong></div><div>₹${stats.monthlyFee}</div><div style="font-size:0.65rem;">${isPaid ? '✅ PAID' : '⚠️ DUE'}</div></div>`;
+                }
+                document.getElementById('monthsGridContainer').innerHTML = monthsHtml;
+                document.querySelectorAll('.month-card.due[data-midx]').forEach(card => {
+                    const idx = parseInt(card.getAttribute('data-midx'));
+                    card.addEventListener('click', () => { 
+                        selectedMonth = idx; 
+                        renderDashboard(); 
+                        document.getElementById('dashFeedback').innerHTML = `📌 Selected ${MONTHS[idx]} (₹${stats.monthlyFee})`; 
+                    });
+                });
+                
+                // Show notification and clear it
+                const notifDiv = document.getElementById('notificationArea');
+                if (currentStudent.notification) {
+                    notifDiv.style.display = 'block';
+                    notifDiv.innerHTML = `<i class="fas fa-bell"></i> ${escapeHtml(currentStudent.notification)}`;
+                    // Clear notification in Firebase
+                    await studentsRef.child(currentStudent.id).update({ notification: null });
+                    currentStudent.notification = null;
+                } else { 
+                    notifDiv.style.display = 'none'; 
+                }
+            } catch (error) {
+                console.error("Render dashboard error:", error);
             }
-            document.getElementById('monthsGridContainer').innerHTML = monthsHtml;
-            document.querySelectorAll('.month-card.due[data-midx]').forEach(card => {
-                const idx = parseInt(card.getAttribute('data-midx'));
-                card.addEventListener('click', () => { selectedMonth = idx; renderDashboard(); document.getElementById('dashFeedback').innerHTML = `📌 Selected ${MONTHS[idx]} (₹${stats.monthlyFee})`; });
-            });
-            // Show notification
-            const notifDiv = document.getElementById('notificationArea');
-            if (currentStudent.notification) {
-                notifDiv.style.display = 'block';
-                notifDiv.innerHTML = `<i class="fas fa-bell"></i> ${escapeHtml(currentStudent.notification)}`;
-                let students = loadStudents();
-                const idx = students.findIndex(s => s.id.toLowerCase() === currentStudent.id.toLowerCase());
-                if (idx !== -1) { students[idx].notification = null; saveStudents(students); currentStudent.notification = null; }
-            } else { notifDiv.style.display = 'none'; }
         }
 
-        // Payment request gateway (NO AUTO PAID)
+        // Payment request gateway (unchanged except async loadStudents where needed)
         function openPaymentRequest(monthIdx) {
             if (!currentStudent || currentStudent.feeStatus[monthIdx]) return false;
             const monthly = getStudentStats(currentStudent).monthlyFee;
@@ -333,31 +420,34 @@
             return true;
         }
 
-        function sendPaymentRequestToAdmin() {
+        async function sendPaymentRequestToAdmin() {
             if (!pendingRequestStudentId || pendingRequestMonth === null) { alert("No active payment request"); return; }
-            const students = loadStudents();
-            const studentObj = students.find(s => s.id.toLowerCase() === pendingRequestStudentId.toLowerCase());
-            if (!studentObj) return;
-            const monthName = MONTHS[pendingRequestMonth];
-            const amount = calculateMonthlyFee(studentObj);
-            const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-            const message = `💰 *PAYMENT REQUEST* 💰\n\n🏫 Triveni Pathsala\n👤 Student: ${studentObj.fullName}\n🆔 ID: ${studentObj.id}\n👨 Father: ${studentObj.fatherName}\n📞 Phone: ${studentObj.phone}\n📆 Month: ${monthName}\n💸 Amount: ₹${amount}\n🕒 Request Time: ${timestamp}\n\n✅ Please verify UPI payment and mark month as PAID in admin panel (single month selection).`;
-            const waLink = `https://wa.me/${ADMIN_WHATSAPP.replace(/^\+/, '')}?text=${encodeURIComponent(message)}`;
-            window.open(waLink, '_blank');
-            document.getElementById('gatewayFeedback').innerHTML = `✅ Request sent to admin for ${monthName}. Admin will mark PAID after verification.`;
-            setTimeout(() => {
-                if (currentStudent) { renderDashboard(); showView('dashboardView'); }
-                else showView('loginView');
-                pendingRequestStudentId = null; pendingRequestMonth = null;
-            }, 2000);
+            try {
+                const snapshot = await studentsRef.child(pendingRequestStudentId).once('value');
+                const studentObj = snapshot.val();
+                if (!studentObj) return;
+                const monthName = MONTHS[pendingRequestMonth];
+                const amount = calculateMonthlyFee(studentObj);
+                const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+                const message = `💰 *PAYMENT REQUEST* 💰\n\n🏫 Triveni Pathsala\n👤 Student: ${studentObj.fullName}\n🆔 ID: ${studentObj.id}\n👨 Father: ${studentObj.fatherName}\n📞 Phone: ${studentObj.phone}\n📆 Month: ${monthName}\n💸 Amount: ₹${amount}\n🕒 Request Time: ${timestamp}\n\n✅ Please verify UPI payment and mark month as PAID in admin panel (single month selection).`;
+                const waLink = `https://wa.me/${ADMIN_WHATSAPP.replace(/^\+/, '')}?text=${encodeURIComponent(message)}`;
+                window.open(waLink, '_blank');
+                document.getElementById('gatewayFeedback').innerHTML = `✅ Request sent to admin for ${monthName}. Admin will mark PAID after verification.`;
+                setTimeout(() => {
+                    if (currentStudent) { 
+                        renderDashboard(); 
+                        showView('dashboardView'); 
+                    } else showView('loginView');
+                    pendingRequestStudentId = null; pendingRequestMonth = null;
+                }, 2000);
+            } catch (error) {
+                console.error(error);
+            }
         }
 
         function redirectToUPI() {
             if (!pendingRequestStudentId || pendingRequestMonth === null) { alert("No active session"); return; }
-            const students = loadStudents();
-            const studentObj = students.find(s => s.id.toLowerCase() === pendingRequestStudentId.toLowerCase());
-            if (!studentObj) return;
-            const amount = calculateMonthlyFee(studentObj);
+            const amount = calculateMonthlyFee(currentStudent); // using currentStudent from cache, okay
             const link = `upi://pay?pa=${encodeURIComponent(MERCHANT_UPI_ID)}&pn=TriveniPathsala&am=${amount.toFixed(2)}&cu=INR`;
             window.location.href = link;
             setTimeout(() => alert("If app doesn't open, install UPI app"), 800);
@@ -373,66 +463,96 @@
         let currentAdminStudentId = null;
         let selectedAdminMonth = null;
 
-        function renderAdminMonthSelector(studentId) {
-            const students = loadStudents();
-            const student = students.find(s => s.id === studentId);
-            if (!student) return;
-            currentAdminStudentId = studentId;
-            const monthly = calculateMonthlyFee(student);
-            const container = document.getElementById('monthButtonsContainer');
-            let html = '';
-            for (let i=0; i<12; i++) {
-                const isPaid = student.feeStatus[i];
-                const isSelected = (selectedAdminMonth === i);
-                let btnClass = 'month-select-btn';
-                if (isPaid) btnClass += ' paid-month';
-                if (isSelected && !isPaid) btnClass += ' selected-month';
-                html += `<div class="${btnClass}" data-month="${i}">
-                            <strong>${MONTHS[i]}</strong><br>
-                            <span style="font-size:0.7rem;">₹${monthly}</span><br>
-                            <span>${isPaid ? 'PAID' : 'DUE'}</span>
-                         </div>`;
-            }
-            container.innerHTML = html;
-            document.querySelectorAll('.month-select-btn:not(.paid-month)').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const idx = parseInt(btn.getAttribute('data-month'));
-                    selectedAdminMonth = idx;
-                    renderAdminMonthSelector(currentAdminStudentId);
+        async function renderAdminMonthSelector(studentId) {
+            try {
+                const snapshot = await studentsRef.child(studentId).once('value');
+                const student = snapshot.val();
+                if (!student) return;
+                currentAdminStudentId = studentId;
+                const monthly = calculateMonthlyFee(student);
+                const container = document.getElementById('monthButtonsContainer');
+                let html = '';
+                for (let i=0; i<12; i++) {
+                    const isPaid = student.feeStatus[i];
+                    const isSelected = (selectedAdminMonth === i);
+                    let btnClass = 'month-select-btn';
+                    if (isPaid) btnClass += ' paid-month';
+                    if (isSelected && !isPaid) btnClass += ' selected-month';
+                    html += `<div class="${btnClass}" data-month="${i}">
+                                <strong>${MONTHS[i]}</strong><br>
+                                <span style="font-size:0.7rem;">₹${monthly}</span><br>
+                                <span>${isPaid ? 'PAID' : 'DUE'}</span>
+                             </div>`;
+                }
+                container.innerHTML = html;
+                document.querySelectorAll('.month-select-btn:not(.paid-month)').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.getAttribute('data-month'));
+                        selectedAdminMonth = idx;
+                        renderAdminMonthSelector(currentAdminStudentId);
+                    });
                 });
-            });
+            } catch (error) {
+                console.error(error);
+            }
         }
 
-        function renderAdminPanel() {
-            const students = loadStudents();
-            const select = document.getElementById('adminStudentSelect');
-            select.innerHTML = '';
-            students.forEach(s => { let opt = document.createElement('option'); opt.value = s.id; opt.textContent = `${s.id} - ${s.fullName}`; select.appendChild(opt); });
-            if (students.length) {
-                currentAdminStudentId = students[0].id;
-                selectedAdminMonth = null;
-                renderAdminMonthSelector(students[0].id);
+        async function renderAdminPanel() {
+            try {
+                const students = await loadStudents();
+                const select = document.getElementById('adminStudentSelect');
+                select.innerHTML = '';
+                students.forEach(s => { 
+                    let opt = document.createElement('option'); 
+                    opt.value = s.id; 
+                    opt.textContent = `${s.id} - ${s.fullName}`; 
+                    select.appendChild(opt); 
+                });
+                if (students.length) {
+                    currentAdminStudentId = students[0].id;
+                    selectedAdminMonth = null;
+                    await renderAdminMonthSelector(students[0].id);
+                }
+                select.onchange = async () => {
+                    currentAdminStudentId = select.value;
+                    selectedAdminMonth = null;
+                    await renderAdminMonthSelector(currentAdminStudentId);
+                };
+            } catch (error) {
+                console.error(error);
             }
-            select.onchange = () => {
-                currentAdminStudentId = select.value;
-                selectedAdminMonth = null;
-                renderAdminMonthSelector(currentAdminStudentId);
-            };
         }
 
         // ========== EVENT LISTENERS ==========
-        document.getElementById('doLoginBtn').onclick = () => {
+        document.getElementById('doLoginBtn').onclick = async () => {
             const id = document.getElementById('loginId').value.trim();
             const pwd = document.getElementById('loginPass').value.trim();
-            const auth = authenticate(id, pwd);
-            if (auth.success) { currentStudent = auth.student; selectedMonth = null; renderDashboard(); showView('dashboardView'); }
-            else document.getElementById('loginFeedback').innerHTML = `⚠️ ${auth.msg}`;
+            document.getElementById('loginFeedback').innerHTML = "⏳ Authenticating...";
+            const auth = await authenticate(id, pwd);
+            if (auth.success) { 
+                currentStudent = auth.student; 
+                selectedMonth = null; 
+                await renderDashboard(); 
+                showView('dashboardView'); 
+            } else {
+                document.getElementById('loginFeedback').innerHTML = `⚠️ ${auth.msg}`;
+            }
         };
         document.getElementById('gotoRegisterBtn').onclick = () => showView('registerView');
         document.getElementById('gotoLoginFromReg').onclick = () => showView('loginView');
         document.getElementById('logoutDashBtn').onclick = () => { currentStudent = null; showView('loginView'); };
-        document.getElementById('paySelectedBtn').onclick = () => { if(selectedMonth !== null && currentStudent && !currentStudent.feeStatus[selectedMonth]) openPaymentRequest(selectedMonth); else document.getElementById('dashFeedback').innerHTML = "❌ Select a DUE month first."; };
-        document.getElementById('closeGatewayBtn').onclick = () => { if(currentStudent) { renderDashboard(); showView('dashboardView'); } else showView('loginView'); };
+        document.getElementById('paySelectedBtn').onclick = () => { 
+            if(selectedMonth !== null && currentStudent && !currentStudent.feeStatus[selectedMonth]) 
+                openPaymentRequest(selectedMonth); 
+            else 
+                document.getElementById('dashFeedback').innerHTML = "❌ Select a DUE month first."; 
+        };
+        document.getElementById('closeGatewayBtn').onclick = async () => { 
+            if(currentStudent) { 
+                await renderDashboard(); 
+                showView('dashboardView'); 
+            } else showView('loginView'); 
+        };
         document.getElementById('sendPaymentRequestBtn').onclick = sendPaymentRequestToAdmin;
         document.getElementById('googlePayBtn').onclick = redirectToUPI;
         document.getElementById('phonePeBtn').onclick = redirectToUPI;
@@ -441,11 +561,11 @@
         // Admin login
         document.getElementById('gotoAdminLoginBtn').onclick = () => showView('adminLoginView');
         document.getElementById('backToLoginFromAdmin').onclick = () => showView('loginView');
-        document.getElementById('verifyAdminBtn').onclick = () => {
+        document.getElementById('verifyAdminBtn').onclick = async () => {
             const id = document.getElementById('adminId').value.trim();
             const pwd = document.getElementById('adminPass').value.trim();
             if (id === ADMIN_ID && pwd === ADMIN_PASS) {
-                renderAdminPanel();
+                await renderAdminPanel();
                 showView('adminDashboardView');
                 document.getElementById('adminFeedback').innerHTML = "Admin: Select a student, then choose a DUE month and click 'Mark as PAID'.";
             } else {
@@ -453,31 +573,35 @@
             }
         };
         document.getElementById('adminLogoutBtn').onclick = () => showView('loginView');
-        document.getElementById('adminMarkPaidBtn').onclick = () => {
+        document.getElementById('adminMarkPaidBtn').onclick = async () => {
             if (!currentAdminStudentId || selectedAdminMonth === null) {
                 document.getElementById('adminFeedback').innerHTML = "❌ Please select a student and a month first.";
                 return;
             }
-            const students = loadStudents();
-            const student = students.find(s => s.id === currentAdminStudentId);
-            if (!student) return;
-            if (student.feeStatus[selectedAdminMonth]) {
-                document.getElementById('adminFeedback').innerHTML = "❌ This month is already PAID.";
-                return;
-            }
-            const monthName = MONTHS[selectedAdminMonth];
-            const notifyMsg = `🔔 Admin marked ${monthName} as PAID on ${new Date().toLocaleString()}. Thank you!`;
-            const success = adminMarkSingleMonthPaid(currentAdminStudentId, selectedAdminMonth, notifyMsg);
-            if (success) {
-                document.getElementById('adminFeedback').innerHTML = `✅ ${monthName} marked as PAID for ${student.fullName}. Notification sent.`;
-                selectedAdminMonth = null;
-                renderAdminMonthSelector(currentAdminStudentId);
-                if (currentStudent && currentStudent.id === currentAdminStudentId) {
-                    currentStudent = loadStudents().find(s => s.id === currentAdminStudentId);
-                    renderDashboard();
+            try {
+                const snapshot = await studentsRef.child(currentAdminStudentId).once('value');
+                const student = snapshot.val();
+                if (!student) return;
+                if (student.feeStatus[selectedAdminMonth]) {
+                    document.getElementById('adminFeedback').innerHTML = "❌ This month is already PAID.";
+                    return;
                 }
-            } else {
-                document.getElementById('adminFeedback').innerHTML = "❌ Failed to update. Month may already be paid.";
+                const monthName = MONTHS[selectedAdminMonth];
+                const notifyMsg = `🔔 Admin marked ${monthName} as PAID on ${new Date().toLocaleString()}. Thank you!`;
+                const success = await adminMarkSingleMonthPaid(currentAdminStudentId, selectedAdminMonth, notifyMsg);
+                if (success) {
+                    document.getElementById('adminFeedback').innerHTML = `✅ ${monthName} marked as PAID for ${student.fullName}. Notification sent.`;
+                    selectedAdminMonth = null;
+                    await renderAdminMonthSelector(currentAdminStudentId);
+                    // If the updated student is the currently logged-in student, refresh dashboard
+                    if (currentStudent && currentStudent.id === currentAdminStudentId) {
+                        await renderDashboard();
+                    }
+                } else {
+                    document.getElementById('adminFeedback').innerHTML = "❌ Failed to update. Month may already be paid.";
+                }
+            } catch (error) {
+                console.error(error);
             }
         };
 
@@ -499,7 +623,7 @@
                 reader.readAsDataURL(file);
             } else { document.getElementById('photoPreview').innerHTML = ''; window.photoBase64 = ''; }
         });
-        document.getElementById('doRegisterBtn').onclick = () => {
+        document.getElementById('doRegisterBtn').onclick = async () => {
             const id = document.getElementById('regId').value.trim();
             const pass = document.getElementById('regPass').value.trim();
             const fullName = document.getElementById('regFullName').value.trim();
@@ -518,17 +642,29 @@
             if(classVal === 'home_tuition') customFee = parseFloat(document.getElementById('homeTuitionFee').value);
             if(!id || pass.length<3 || !fullName || !father) { alert("Fill all required fields (ID, password, name, father)"); return; }
             const photo = window.photoBase64 || "";
-            const res = registerStudent({ id, password: pass, fullName, fatherName: father, phone, class: classVal, subjects, customFee, photoBase64: photo, admissionDate });
+            document.getElementById('regFeedback').innerHTML = "⏳ Registering...";
+            const res = await registerStudent({ id, password: pass, fullName, fatherName: father, phone, class: classVal, subjects, customFee, photoBase64: photo, admissionDate });
             document.getElementById('regFeedback').innerHTML = res.msg;
             if(res.success) setTimeout(() => showView('loginView'), 1500);
         };
 
-        // Seed demo student if empty
-        if(loadStudents().length === 0) {
-            let demo = { id:"sumit", password:"1234", fullName:"Sumit Kumar", fatherName:"Ramesh Kumar", phone:"9876543210", class:"11", subjects:["Physics","Maths"], customFee:null, photoBase64:"", admissionDate:"2024-04-01", feeStatus:[true,true,false,false,false,false,false,false,false,false,false,false], notification: null };
-            saveStudents([demo]);
-        }
-        showView('loginView');
+        // Seed demo student if database is empty (optional)
+        (async function seedIfEmpty() {
+            const students = await loadStudents();
+            if (students.length === 0) {
+                let demo = { 
+                    id:"sumit", password:"1234", fullName:"Sumit Kumar", fatherName:"Ramesh Kumar", 
+                    phone:"9876543210", class:"11", subjects:["Physics","Maths"], customFee:null, 
+                    photoBase64:"", admissionDate:"2024-04-01", 
+                    feeStatus:[true,true,false,false,false,false,false,false,false,false,false,false], 
+                    notification: null 
+                };
+                await saveStudent(demo);
+                console.log("Demo student added.");
+            }
+            showView('loginView');
+        })();
+
     })();
 </script>
 </body>
