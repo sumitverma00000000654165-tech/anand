@@ -1,1019 +1,671 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Alpha Study | Set Practice Platform</title>
-    <!-- Font Awesome 6 & Google Fonts -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="⚡ Triveni Pathsala — Lightning fast smart redirect with stunning modern UI.">
+  <meta name="robots" content="noindex, nofollow">
+  <title>⚡ Triveni Pathsala · Vortex Redirect</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
 
-        :root {
-            --orange: #f97316;
-            --orange-light: #ffb347;
-            --blue-dark: #1e3c72;
-            --blue-mid: #2c6e9e;
-            --bg: #f5f7fe;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-light: #4b5563;
-            --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 8px 22px rgba(0, 0, 0, 0.07);
-            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
-            --radius-sm: 16px;
-            --radius-md: 22px;
-            --radius-lg: 30px;
-            --transition: 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-        }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 30% 40%, #0B1120, #020408);
+      font-family: 'Inter', system-ui, -apple-system, 'SF Pro Text', 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.2rem;
+      position: relative;
+      overflow-x: hidden;
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f0f3fa;
-            color: var(--text);
-            scroll-behavior: smooth;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
+    /* animated organic noise + floating light rays */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle at 25% 40%, rgba(255, 180, 70, 0.08) 1.2%, transparent 1.8%),
+                        repeating-linear-gradient(45deg, rgba(255, 200, 80, 0.02) 0px, rgba(255, 200, 80, 0.02) 2px, transparent 2px, transparent 8px);
+      background-size: 65px 65px, 12px 12px;
+      pointer-events: none;
+      z-index: 0;
+      animation: driftGlow 22s infinite alternate;
+    }
 
-        /* ========== KEYFRAMES ========== */
-        @keyframes fadeInUp {
-            0% { opacity: 0; transform: translateY(36px) scale(0.94); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes fadeInDown {
-            0% { opacity: 0; transform: translateY(-24px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes popIn {
-            0% { opacity: 0; transform: scale(0.7); }
-            65% { opacity: 1; transform: scale(1.04); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        @keyframes pulseBadge {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
-            50% { transform: scale(1.18); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-        }
-        @keyframes floatIcon {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-7px) rotate(3deg); }
-            50% { transform: translateY(-3px) rotate(-2deg); }
-            75% { transform: translateY(-9px) rotate(1deg); }
-        }
-        @keyframes shimmerCard {
-            0% { left: -150%; }
-            100% { left: 150%; }
-        }
-        @keyframes gentleGlow {
-            0%, 100% { box-shadow: 0 4px 16px rgba(249, 115, 22, 0.08); }
-            50% { box-shadow: 0 8px 30px rgba(249, 115, 22, 0.22); }
-        }
-        @keyframes rippleOut {
-            0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.5); }
-            100% { box-shadow: 0 0 0 22px rgba(249, 115, 22, 0); }
-        }
-        @keyframes slideInLeft {
-            0% { opacity: 0; transform: translateX(-50px); }
-            100% { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes slideInRight {
-            0% { opacity: 0; transform: translateX(50px); }
-            100% { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes modalBounceIn {
-            0% { opacity: 0; transform: scale(0.8) translateY(-50px); }
-            55% { opacity: 1; transform: scale(1.03) translateY(8px); }
-            75% { transform: scale(0.97) translateY(-4px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        @keyframes dotPulse {
-            0%, 100% { box-shadow: 0 0 4px #f97316; }
-            50% { box-shadow: 0 0 18px #f97316, 0 0 30px rgba(249, 115, 22, 0.5); }
-        }
-        @keyframes stripeSlide {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
-        }
-        @keyframes cardGlowPulse {
-            0%, 100% { box-shadow: 0 4px 14px rgba(249,115,22,0.05); }
-            50% { box-shadow: 0 8px 24px rgba(249,115,22,0.15); }
-        }
+    @keyframes driftGlow {
+      0% { background-position: 0% 0%, 0% 0%; opacity: 0.6; }
+      100% { background-position: 80px 100px, 40px 20px; opacity: 1; }
+    }
 
-        .card-animate {
-            animation: fadeInUp 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.05) forwards;
-            opacity: 0;
-        }
+    /* main neomorphic glass card */
+    .redirect-card {
+      max-width: 560px;
+      width: 100%;
+      background: rgba(12, 22, 35, 0.55);
+      backdrop-filter: blur(24px);
+      border-radius: 3.5rem;
+      border: 1px solid rgba(255, 210, 100, 0.4);
+      box-shadow: 0 35px 60px -20px rgba(0,0,0,0.6), 0 0 0 0.8px rgba(255, 210, 90, 0.2) inset, 0 8px 20px rgba(0,0,0,0.3);
+      padding: 2rem 1.8rem;
+      transition: transform 0.25s ease, box-shadow 0.35s ease;
+      z-index: 2;
+      animation: cardBreathing 4s infinite alternate;
+    }
 
-        /* ========== SCROLLBAR ========== */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 20px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    @keyframes cardBreathing {
+      0% { border-color: rgba(255, 200, 100, 0.35); box-shadow: 0 30px 50px -20px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(255, 210, 90, 0.2) inset; }
+      100% { border-color: rgba(255, 190, 70, 0.75); box-shadow: 0 40px 65px -12px rgba(255, 150, 40, 0.3), 0 0 0 2px rgba(255, 200, 80, 0.35) inset; }
+    }
 
-        /* ========== CONTAINER ========== */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 12px;
-        }
+    @media (max-width: 500px) {
+      .redirect-card {
+        padding: 1.5rem 1.2rem;
+        border-radius: 2.5rem;
+      }
+    }
 
-        /* ========== HEADER ========== */
-        .main-header {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            animation: fadeInDown 0.5s ease forwards;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-        }
-        .header-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 14px;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
-        }
-        .logo-area:hover { transform: scale(1.04); }
-        .logo-area:active { transform: scale(0.96); }
-        .logo-icon {
-            background: linear-gradient(135deg, #1e3c72, #2b4c8a);
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            box-shadow: 0 6px 14px rgba(30, 60, 114, 0.2);
-            transition: var(--transition);
-        }
-        .logo-area:hover .logo-icon {
-            box-shadow: 0 8px 22px rgba(30, 60, 114, 0.35);
-            transform: rotate(-5deg) scale(1.05);
-        }
-        .site-name {
-            font-weight: 800;
-            font-size: 1.2rem;
-            background: linear-gradient(135deg, #0f2b3d, #1e4a76);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            letter-spacing: -0.4px;
-            white-space: nowrap;
-            animation: fadeInDown 0.6s ease forwards;
-        }
-        .notify-icon {
-            background: #f1f5f9;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            color: #1e4a76;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            border: 2px solid transparent;
-        }
-        .notify-icon:hover {
-            background: #e2e8f0;
-            transform: scale(1.06);
-            border-color: #cbd5e1;
-        }
-        .notify-icon:active {
-            transform: scale(0.92);
-            animation: rippleOut 0.6s ease-out;
-        }
-        .notify-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ef4444;
-            color: white;
-            font-size: 0.6rem;
-            font-weight: 700;
-            padding: 3px 7px;
-            border-radius: 30px;
-            border: 2px solid white;
-            animation: pulseBadge 1.8s infinite;
-            min-width: 20px;
-            text-align: center;
-        }
+    /* brand zone with electric pulse */
+    .brand {
+      text-align: center;
+      margin-bottom: 1.8rem;
+    }
 
-        /* ========== WELCOME STRIP ========== */
-        .welcome-strip {
-            background: linear-gradient(105deg, #eef2ff, #ffffff, #fef7ee);
-            background-size: 200% 100%;
-            animation: stripeSlide 6s ease infinite;
-            margin-top: 10px;
-            margin-bottom: 16px;
-            padding: 11px 18px;
-            border-radius: 50px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-            font-weight: 500;
-            font-size: 0.9rem;
-            border: 1px solid rgba(249, 115, 22, 0.08);
-        }
-        .welcome-strip i {
-            font-size: 1.6rem;
-            color: #f59e0b;
-            animation: floatIcon 2.5s ease-in-out infinite;
-        }
-        .welcome-strip:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-        }
-        .greeting-name {
-            font-weight: 700;
-            background: linear-gradient(120deg, #f97316, #ff914d);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
+    .lightning-icon {
+      font-size: 3.4rem;
+      display: inline-block;
+      filter: drop-shadow(0 0 10px #ffb347);
+      animation: electricPulse 1.6s ease-in-out infinite, levitate 3s ease-in-out infinite;
+    }
 
-        /* ========== SLIDER (NO ARROW BUTTONS) ========== */
-        .slider-section {
-            margin: 16px 0 24px;
-            position: relative;
-            animation: fadeInUp 0.55s ease forwards;
-        }
-        .slider-container {
-            position: relative;
-            overflow: hidden;
-            border-radius: 22px;
-            box-shadow: var(--shadow-lg);
-            transition: all 0.35s ease;
-            animation: gentleGlow 4s ease-in-out infinite;
-        }
-        .slider-container:hover {
-            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.18);
-            transform: translateY(-2px);
-        }
-        .slides-wrapper {
-            display: flex;
-            transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.05);
-            will-change: transform;
-        }
-        .slide {
-            flex: 0 0 100%;
-            background-size: cover;
-            background-position: center;
-            min-height: 240px;
-            padding: 24px 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            color: white;
-            overflow: hidden;
-        }
-        .slide::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg,
-                    rgba(0, 0, 0, 0.25) 0%,
-                    rgba(0, 0, 0, 0.05) 40%,
-                    rgba(0, 0, 0, 0.55) 100%);
-            pointer-events: none;
-            z-index: 1;
-            transition: opacity 0.3s ease;
-        }
-        .slide:hover::after { opacity: 0.75; }
-        .slide > * { position: relative; z-index: 2; }
-        .slide h2 {
-            font-size: 1.3rem;
-            font-weight: 800;
-            margin-bottom: 6px;
-            letter-spacing: -0.3px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-            line-height: 1.2;
-        }
-        .slide p {
-            font-size: 0.85rem;
-            line-height: 1.35;
-            max-width: 85%;
-            opacity: 0.92;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-        }
-        .btn-slide {
-            display: inline-block;
-            margin-top: 14px;
-            background: rgba(255, 255, 255, 0.22);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: white;
-            padding: 7px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            width: fit-content;
-            font-size: 0.8rem;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            cursor: pointer;
-            letter-spacing: 0.2px;
-        }
-        .btn-slide:hover {
-            background: rgba(255, 255, 255, 0.4);
-            transform: translateX(6px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-            border-color: rgba(255, 255, 255, 0.6);
-        }
-        .btn-slide:active { transform: translateX(2px) scale(0.96); }
-        .dots {
-            text-align: center;
-            margin-top: 14px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .dot {
-            width: 9px;
-            height: 9px;
-            background: #cbd5e1;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
-        }
-        .dot.active {
-            background: #f97316;
-            width: 26px;
-            animation: dotPulse 2s ease-in-out infinite;
-        }
-        .dot:hover { background: #f97316; transform: scale(1.3); }
+    @keyframes electricPulse {
+      0% { text-shadow: 0 0 2px #ffcc66, 0 0 4px #ffaa33; transform: scale(1);}
+      50% { text-shadow: 0 0 22px #ffdd88, 0 0 15px #ffaa33; transform: scale(1.07);}
+      100% { text-shadow: 0 0 2px #ffcc66, 0 0 4px #ffaa33; transform: scale(1);}
+    }
 
-        /* ========== SECTION TITLE ========== */
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin: 28px 0 14px 4px;
-            position: relative;
-            display: inline-block;
-            animation: slideInLeft 0.5s ease forwards;
-            letter-spacing: -0.3px;
-        }
-        .section-title:after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 0;
-            width: 55%;
-            height: 3px;
-            background: linear-gradient(90deg, #f97316, #ffb347, #f97316);
-            background-size: 200% 100%;
-            border-radius: 4px;
-            animation: stripeSlide 3s ease infinite;
-        }
+    @keyframes levitate {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
 
-        /* ========== CARDS GRID - 3 PER ROW, WITH EXTRA ANIMATED SHIMMER ========== */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 18px 0 30px;
-        }
+    .brand h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(125deg, #FFE6B0, #FFBC4A, #FFD977);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+      margin-top: 0.6rem;
+      margin-bottom: 0.2rem;
+    }
 
-        a.resource-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 14px 8px;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.15);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100%;
-            -webkit-tap-highlight-color: transparent;
-            animation: fadeInUp 0.45s ease forwards, cardGlowPulse 3s ease-in-out infinite;
-            opacity: 0;
-        }
-        /* Top hover line */
-        a.resource-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, #f97316, #ffb347);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.35s ease;
-            z-index: 2;
-            border-radius: 0 0 3px 3px;
-        }
-        /* Shimmer sweep effect (continuous) */
-        a.resource-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -150%;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-            transform: skewX(-20deg);
-            z-index: 0;
-            animation: shimmerCard 4s ease-in-out infinite;
-        }
-        a.resource-card:hover::before { transform: scaleX(1); }
-        a.resource-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.13);
-            border-color: rgba(249, 115, 22, 0.2);
-        }
-        a.resource-card:active {
-            transform: scale(0.94);
-            transition: all 0.1s ease;
-            box-shadow: var(--shadow-sm);
-        }
-        a.resource-card .card-icon {
-            font-size: 1.6rem;
-            color: #2c6e9e;
-            margin-bottom: 8px;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-        }
-        a.resource-card:hover .card-icon {
-            transform: scale(1.15);
-            color: #f97316;
-            animation: floatIcon 1.2s ease-in-out;
-        }
-        a.resource-card h4 {
-            font-size: 0.78rem;
-            font-weight: 700;
-            margin: 2px 0;
-            letter-spacing: -0.2px;
-            line-height: 1.2;
-            z-index: 1;
-        }
-        a.resource-card p {
-            font-size: 0.68rem;
-            color: #64748b;
-            margin-top: 3px;
-            z-index: 1;
-            line-height: 1.3;
-        }
-        .badge-new {
-            background: #f97316;
-            color: white;
-            font-size: 0.6rem;
-            font-weight: 600;
-            padding: 3px 10px;
-            border-radius: 30px;
-            display: inline-block;
-            margin-top: 8px;
-            width: fit-content;
-            align-self: center;
-            z-index: 1;
-            animation: pulseBadge 2.5s ease-in-out infinite;
-            letter-spacing: 0.3px;
-        }
+    .brand p {
+      color: #cae3ff;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      opacity: 0.9;
+      text-transform: uppercase;
+    }
 
-        /* ========== FOOTER (more space above) ========== */
-        .footer-nav {
-            background: #ffffff;
-            border-top: 1px solid #eef2f6;
-            margin-top: 80px;               /* Increased to push footer further down */
-            padding: 18px 12px 24px;
-            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.03);
-            animation: fadeInUp 0.55s ease forwards;
-        }
-        .footer-items {
-            max-width: 700px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            text-align: center;
-        }
-        .footer-item {
-            flex: 1;
-            min-width: 55px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            color: #334155;
-            font-weight: 500;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            padding: 8px 6px;
-            border-radius: 14px;
-            font-size: 0.72rem;
-            position: relative;
-        }
-        .footer-item i {
-            font-size: 1.3rem;
-            color: #2c6e9e;
-            transition: all 0.25s ease;
-        }
-        .footer-item:hover {
-            color: #f97316;
-            transform: translateY(-6px);
-            background: #fef7ee;
-        }
-        .footer-item:hover i {
-            color: #f97316;
-            transform: scale(1.15) rotate(-6deg);
-        }
-        .footer-item:active {
-            transform: scale(0.9);
-            transition: all 0.1s ease;
-        }
-        .footer-item.chat-whatsapp { position: relative; }
-        .footer-item.chat-whatsapp::after {
-            content: '💬';
-            position: absolute;
-            top: -6px;
-            right: -2px;
-            font-size: 0.7rem;
-            animation: floatIcon 2s ease-in-out infinite;
-            pointer-events: none;
-        }
-        .copyright {
-            text-align: center;
-            font-size: 0.65rem;
-            color: #94a3b8;
-            margin-top: 18px;
-            letter-spacing: 0.3px;
-        }
+    /* hidden destination - elegant minimal badge */
+    .secure-zone {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 2rem;
+      margin: 0.5rem 0 1.5rem 0;
+      padding: 0.8rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 190, 80, 0.3);
+    }
 
-        /* ========== NAME MODAL ========== */
-        .name-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            visibility: visible;
-            opacity: 1;
-            transition: opacity 0.35s ease;
-        }
-        .name-modal-overlay.hide {
-            opacity: 0;
-            visibility: hidden;
-            transition: visibility 0.35s, opacity 0.35s;
-        }
-        .name-modal {
-            background: linear-gradient(155deg, #ffffff, #f8fafc);
-            border-radius: 30px;
-            max-width: 400px;
-            width: 90%;
-            padding: 28px 22px;
-            text-align: center;
-            box-shadow: 0 30px 55px rgba(0,0,0,0.35);
-            animation: modalBounceIn 0.55s cubic-bezier(0.34, 1.2, 0.64, 1);
-            transform-origin: center;
-        }
-        .name-modal h3 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #1e3c72, #f97316);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            margin-bottom: 8px;
-        }
-        .name-modal p { color: #475569; margin-bottom: 20px; font-size: 0.85rem; }
-        .name-modal input {
-            width: 100%;
-            padding: 13px 16px;
-            font-size: 0.95rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 50px;
-            outline: none;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.25s;
-            background: white;
-        }
-        .name-modal input:focus {
-            border-color: #f97316;
-            box-shadow: 0 0 0 5px rgba(249,115,22,0.12);
-        }
-        .name-modal button {
-            margin-top: 20px;
-            background: linear-gradient(105deg, #f97316, #ff914d);
-            border: none;
-            padding: 12px 20px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.25s ease;
-            box-shadow: 0 8px 20px rgba(249,115,22,0.3);
-        }
-        .name-modal button:hover {
-            transform: scale(1.03);
-            background: linear-gradient(105deg, #e2620e, #ff7a2c);
-            box-shadow: 0 12px 28px rgba(249,115,22,0.45);
-        }
-        .name-modal button:active { transform: scale(0.95); }
-        .modal-icon {
-            font-size: 2.8rem;
-            color: #f97316;
-            margin-bottom: 6px;
-            animation: floatIcon 3s ease-in-out infinite;
-        }
+    .shield-message {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
 
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 420px) {
-            .cards-grid { gap: 7px; }
-            a.resource-card { padding: 10px 5px; border-radius: 13px; }
-            a.resource-card .card-icon { font-size: 1.3rem; margin-bottom: 5px; }
-            a.resource-card h4 { font-size: 0.7rem; }
-            a.resource-card p { font-size: 0.62rem; }
-            .badge-new { font-size: 0.55rem; padding: 2px 8px; margin-top: 5px; }
-            .slide { min-height: 190px; padding: 18px 14px; }
-            .slide h2 { font-size: 1.05rem; }
-            .slide p { font-size: 0.72rem; max-width: 95%; }
-            .btn-slide { font-size: 0.7rem; padding: 6px 15px; }
-            .site-name { font-size: 1rem; }
-            .section-title { font-size: 1.1rem; }
-            .footer-item { font-size: 0.65rem; gap: 3px; padding: 6px 3px; }
-            .footer-item i { font-size: 1.1rem; }
-        }
-        @media (min-width: 421px) and (max-width: 600px) {
-            .cards-grid { gap: 9px; }
-            a.resource-card { padding: 12px 6px; border-radius: 15px; }
-            a.resource-card .card-icon { font-size: 1.45rem; }
-            a.resource-card h4 { font-size: 0.74rem; }
-            a.resource-card p { font-size: 0.65rem; }
-            .slide { min-height: 210px; }
-            .slide h2 { font-size: 1.15rem; }
-        }
-        @media (min-width: 601px) and (max-width: 900px) {
-            .cards-grid { gap: 12px; }
-            a.resource-card { padding: 16px 10px; border-radius: 18px; }
-            a.resource-card .card-icon { font-size: 1.8rem; }
-            a.resource-card h4 { font-size: 0.82rem; }
-            a.resource-card p { font-size: 0.7rem; }
-            .slide { min-height: 260px; padding: 28px 24px; }
-            .slide h2 { font-size: 1.5rem; }
-        }
-        @media (min-width: 901px) {
-            .cards-grid { gap: 16px; }
-            a.resource-card { padding: 18px 12px; border-radius: 20px; }
-            a.resource-card .card-icon { font-size: 2rem; }
-            a.resource-card h4 { font-size: 0.88rem; }
-            a.resource-card p { font-size: 0.73rem; }
-            .slide { min-height: 290px; padding: 32px 28px; }
-            .slide h2 { font-size: 1.7rem; }
-            .slide p { font-size: 0.95rem; }
-            .site-name { font-size: 1.4rem; }
-            .section-title { font-size: 1.5rem; }
-        }
-        @media (max-width: 330px) {
-            .cards-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
-            a.resource-card { padding: 8px 4px; border-radius: 10px; }
-            a.resource-card .card-icon { font-size: 1.1rem; margin-bottom: 3px; }
-            a.resource-card h4 { font-size: 0.65rem; }
-            a.resource-card p { font-size: 0.58rem; }
-            .badge-new { font-size: 0.5rem; padding: 2px 6px; margin-top: 3px; }
-            .slide { min-height: 160px; padding: 14px 10px; }
-            .slide h2 { font-size: 0.9rem; }
-            .slide p { font-size: 0.65rem; }
-            .btn-slide { font-size: 0.65rem; padding: 5px 12px; }
-            .site-name { font-size: 0.85rem; }
-        }
-    </style>
+    .shield-message span:first-child {
+      font-size: 1.25rem;
+      filter: drop-shadow(0 0 4px #ffb347);
+    }
+
+    .shield-message .info-text {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #eef5ff;
+      letter-spacing: 0.3px;
+    }
+
+    .copy-dest-btn {
+      background: rgba(255, 200, 100, 0.12);
+      border: 1px solid rgba(255, 200, 100, 0.5);
+      border-radius: 3rem;
+      padding: 0.45rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #FFE3A3;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+      backdrop-filter: blur(5px);
+    }
+
+    .copy-dest-btn:hover {
+      background: rgba(255, 190, 70, 0.35);
+      border-color: #ffcc66;
+      transform: scale(1.02);
+      box-shadow: 0 2px 8px rgba(255, 180, 50, 0.3);
+    }
+
+    .copy-dest-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* countdown core */
+    .countdown-area {
+      margin: 1.2rem 0 1.4rem;
+    }
+
+    .timer-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.6rem;
+    }
+
+    .timer-label {
+      color: #c7ddff;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .seconds-badge {
+      font-size: 3rem;
+      font-weight: 800;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      background: linear-gradient(145deg, #FFE0A0, #FFB347);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: 6px;
+      transition: 0.08s linear;
+      animation: countPop 0.3s ease-out;
+    }
+
+    @keyframes countPop {
+      0% { transform: scale(0.7); opacity: 0.4; letter-spacing: 12px; }
+      100% { transform: scale(1); opacity: 1; letter-spacing: 6px; }
+    }
+
+    /* glowing progress bar */
+    .progress-container {
+      background: #101a24;
+      border-radius: 60px;
+      height: 12px;
+      width: 100%;
+      overflow: hidden;
+      margin: 0.6rem 0 0.2rem;
+      box-shadow: inset 0 1px 4px #00000055;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #FFD966, #FFA94D, #FFD580);
+      width: 100%;
+      height: 100%;
+      border-radius: 60px;
+      transition: width 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+      box-shadow: 0 0 12px #ffaa44;
+      position: relative;
+    }
+
+    /* button group modern */
+    .action-group {
+      display: flex;
+      gap: 1rem;
+      margin: 1.8rem 0 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      flex: 1;
+      min-width: 140px;
+      padding: 0.9rem 0.5rem;
+      border-radius: 3rem;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+      text-align: center;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      backdrop-filter: blur(5px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(115deg, #F0A81E, #FFC34D);
+      color: #0f1a21;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(255, 150, 30, 0.35);
+      border: 1px solid rgba(255, 240, 160, 0.7);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(115deg, #FFB83B, #FFD46E);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 25px rgba(255, 150, 30, 0.55);
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+
+    .btn-outline {
+      background: rgba(18, 35, 48, 0.7);
+      border: 1.5px solid rgba(255, 190, 70, 0.7);
+      color: #ffefbf;
+      font-weight: 600;
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 180, 60, 0.25);
+      border-color: #FFD27A;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.25);
+    }
+
+    /* modern footnote */
+    .info-footnote {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.7rem;
+      color: #97afd1;
+      border-top: 1px dashed rgba(255, 200, 100, 0.35);
+      padding-top: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .info-footnote span {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      backdrop-filter: blur(2px);
+      font-weight: 500;
+    }
+
+    /* flash overlay for redirect */
+    @keyframes lightningFlash {
+      0% { opacity: 0; }
+      12% { opacity: 0.7; background: radial-gradient(circle at center, #FFE5A0, #FFB347, transparent); }
+      100% { opacity: 0; }
+    }
+
+    .flash-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(255,220,100,0.45), rgba(255,150,30,0.2));
+      z-index: 999;
+      animation: lightningFlash 0.5s ease-out forwards;
+    }
+
+    /* mini toast feedback */
+    .toast-msg {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.9);
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      color: #FFE2A4;
+      padding: 0.6rem 1.3rem;
+      border-radius: 60px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      z-index: 1000;
+      border: 1px solid #ffbc5e;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast-msg.show {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+
+    @media (max-width: 480px) {
+      .btn { padding: 0.8rem 0.2rem; font-size: 0.9rem; min-width: 120px; }
+      .seconds-badge { font-size: 2.5rem; letter-spacing: 4px; }
+      .shield-message .info-text { font-size: 0.7rem; }
+    }
+  </style>
 </head>
 <body>
 
-    <!-- HEADER -->
-    <div class="main-header">
-        <div class="header-container container">
-            <div class="logo-area" onclick="window.location.href='/'" title="Triveni Pathsala Home">
-                <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
-                <span class="site-name">⚡ Triveni Pathsala ⚡</span>
-            </div>
-            <div class="notify-icon" id="notificationBtn" title="Notifications">
-                <i class="fas fa-bell"></i>
-                <span class="notify-badge">3</span>
-            </div>
-        </div>
+<div class="redirect-card">
+  <div class="brand">
+    <div class="lightning-icon">⚡⚡⚡</div>
+    <h1>Triveni Pathsala</h1>
+    <p>The Aim of Excellence.</p>
+  </div>
+
+  <!-- Secure hidden destination zone: no URL preview, only copy action -->
+  <div class="secure-zone">
+    <div class="shield-message">
+      <span></span>
+      
+    <align="center"><span class="info-text">    A premium Institute of JEE & NEET  </span></align>
+    
+  </div>
+    <div class="copy" id="">
+      <span></span> <span></span>
     </div>
+  </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="container">
-        <div class="welcome-strip">
-            <i class="fas fa-hand-peace"></i>
-            <span>नमस्ते, <span class="greeting-name" id="greetingUser">Sumit Verma</span> 👋</span>
-        </div>
-
-        <!-- SLIDER SECTION (ARROW BUTTONS REMOVED) -->
-        <div class="slider-section">
-            <div class="slider-container">
-                <div class="slides-wrapper" id="slidesWrapper"></div>
-                <!-- No prev/next buttons anymore -->
-            </div>
-            <div class="dots" id="dotsContainer"></div>
-        </div>
-
-        <!-- EXPLORE PREMIUM RESOURCES -->
-        <div>
-            <h2 class="section-title">📚 Explore Premium Resources</h2>
-            <div class="cards-grid" id="twelveSectionsGrid"></div>
-        </div>
+  <div class="countdown-area">
+    <div class="timer-flex">
+      <div class="timer-label">
+        <span>⚡</span> LIGHTNING REDIRECT IN
+      </div>
+      <div class="seconds-badge" id="countdownDisplay">5</div>
     </div>
-
-    <!-- FOOTER (more space above) -->
-    <div class="footer-nav">
-        <div class="footer-items">
-            <div class="footer-item" data-link="/alpha-home">
-                <i class="fas fa-home"></i><span>Home</span>
-            </div>
-            <div class="footer-item" data-link="/my-purchases">
-                <i class="fas fa-shopping-bag"></i><span>My Purchases...</span>
-            </div>
-            <div class="footer-item chat-whatsapp" data-link="whatsapp" id="whatsappChatBtn">
-                <i class="fab fa-whatsapp"></i><span>Chat</span>
-            </div>
-        </div>
-        <div class="copyright">© 2026 Triveni Pathsala • Made with ❤️ for students</div>
+    <div class="progress-container">
+      <div class="progress-fill" id="progressFill" style="width: 100%;"></div>
     </div>
+  </div>
 
-    <script>
-        // ==================== 1. NAME MODAL ====================
-        function initNameModal() {
-            const storedName = localStorage.getItem('alphaStudentName');
-            const greetingSpan = document.getElementById('greetingUser');
-            if (storedName && storedName.trim() !== "") {
-                if (greetingSpan) greetingSpan.innerText = storedName;
-                return;
-            }
-            const modalOverlay = document.createElement('div');
-            modalOverlay.className = 'name-modal-overlay';
-            modalOverlay.innerHTML = `
-            <div class="name-modal">
-              <div class="modal-icon"><i class="fas fa-user-astronaut"></i></div>
-              <h3>Welcome, Future Achiever! 🚀</h3>
-              <p>Please tell us your name to personalize your learning journey</p>
-              <input type="text" id="studentNameInput" placeholder="e.g., your name" autocomplete="off">
-              <button id="submitNameBtn">Continue →</button>
-            </div>`;
-            document.body.appendChild(modalOverlay);
-            const inputField = document.getElementById('studentNameInput');
-            const submitBtn = document.getElementById('submitNameBtn');
-            function saveAndClose() {
-                let enteredName = inputField.value.trim();
-                if (enteredName === "") enteredName = "Student";
-                if (greetingSpan) greetingSpan.innerText = enteredName;
-                localStorage.setItem('alphaStudentName', enteredName);
-                modalOverlay.classList.add('hide');
-                setTimeout(() => modalOverlay.remove(), 350);
-            }
-            submitBtn.addEventListener('click', saveAndClose);
-            inputField.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveAndClose(); });
-            setTimeout(() => inputField.focus(), 120);
+  <div class="action-group">
+    <button class="btn btn-primary" id="redirectNowBtn">🚀 REDIRECT NOW</button>
+    <button class="btn btn-outline" id="toggleHoldBtn">⏸️ HOLD</button>
+  </div>
+
+  <div class="info-footnote">
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<!-- toast container -->
+<div id="copyToast" class="toast-msg">✨ Link copied to clipboard</div>
+
+<script>
+  (function() {
+    // ---------- CONFIGURATION ----------
+    const DEFAULT_REDIRECT_URL = "https://sumitverma00000000654165-tech.github.io/landingpage/";
+    
+    // URL sanitizer (security first)
+    function sanitizeRedirectUrl(input) {
+      if (!input || typeof input !== 'string') return DEFAULT_REDIRECT_URL;
+      let raw = input.trim();
+      if (raw === "") return DEFAULT_REDIRECT_URL;
+      
+      const dangerous = /^(javascript|data|vbscript):/i;
+      if (dangerous.test(raw)) return DEFAULT_REDIRECT_URL;
+      
+      if (!/^https?:\/\//i.test(raw)) {
+        raw = "https://" + raw;
+      }
+      
+      try {
+        const urlObj = new URL(raw);
+        if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+          return DEFAULT_REDIRECT_URL;
         }
-
-        // ==================== 2. SLIDER (NO ARROW BUTTONS, TOUCH + DOTS ONLY) ====================
-        const slidesData = [
-            { title: "", desc: "", bg: "linear-gradient(120deg, #0b2b44, #1a4a6e)", btn: "", link: "", img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj7JkWbfXAzRFB6aYAFyqhcgHLSPcKJuvjCUKBObKzenD8H7d4XkLvnwZEAdCa3AyVSg2s3VHn644F81Cfy2YhdL2i1hDSgbifhRnej3VFgJIQbLi25CwTIXk5vXNGiJqAjUy3qcKeO6-5xOp9okglWbfjwJ1BTtBugN7w4WmYP8uppB1F6JyZcxZESjAbM/s320/full.jpg" },
-            { title: "", desc: "", bg: "linear-gradient(140deg, #2c3e50, #3e5a6f)", btn: "", link: "", img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgBFsjJw3EhWr4u9SzsPqOSmGt-NpjbtPD9_euZX3MVfCh8JRHckuRf-Q43nM0efuz3VrfLLZrifhJSlfgQ34orfAFGRqhRV268SQa1gxhbsz4IyMf_40ruGHkGB5JEQQI_Z5sKrWJuYMFwEO-wDtbimMYp-685vBmx0nYAOYR-fHljGx2xCqUubtfocfhq/s320/c99.jpg" },
-            { title: "", desc: "", bg: "linear-gradient(100deg, #14532d, #2b7a4b)", btn: "", link: "", img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgFI6IGmydL40avO7lSmhja9KMq6Oeh6crxChk50B7roLxI52LqCn8swXIcDonIusw4z_28Lcv0o53vsqvdLpFk5KIBiWuleZQWhQTtPYiVtV9EmkexJip0Lvf4kggLOxlR6gc63HEEJRTvEW_6KMSK6qaEODj8Vkeh-Afbm8dGYWlpImI9Eria5sjiBn5u/s320/class%2012.jpg" },
-             
-            ];
-
-        let currentIndex = 0;
-        let totalSlides = slidesData.length;
-        let slidesWrapper = document.getElementById('slidesWrapper');
-        let dotsContainer = document.getElementById('dotsContainer');
-        let autoInterval;
-
-        function buildSlides() {
-            slidesWrapper.innerHTML = '';
-            slidesData.forEach((slide) => {
-                const slideDiv = document.createElement('div');
-                slideDiv.className = 'slide';
-                slideDiv.style.color = 'white';
-                slideDiv.setAttribute('data-slide-link', slide.link);
-                if (slide.img) {
-                    slideDiv.style.background = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.5)), url(${slide.img}) center/cover no-repeat, ${slide.bg}`;
-                } else {
-                    slideDiv.style.background = slide.bg;
-                }
-                slideDiv.innerHTML = `<h2>${slide.title}</h2><p>${slide.desc}</p><div class="" data-link="${slide.link}">${slide.btn}</div>`;
-                slidesWrapper.appendChild(slideDiv);
-            });
-            attachSlideRedirects();
+        return urlObj.href;
+      } catch (e) {
+        return DEFAULT_REDIRECT_URL;
+      }
+    }
+    
+    // get redirect url from query param "redirect"
+    function getInitialRedirectUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let customParam = urlParams.get('redirect');
+      if (customParam) {
+        try {
+          customParam = decodeURIComponent(customParam);
+        } catch(e) { /* fallback */ }
+        return sanitizeRedirectUrl(customParam);
+      }
+      return DEFAULT_REDIRECT_URL;
+    }
+    
+    // DOM elements
+    const countdownDisplay = document.getElementById('countdownDisplay');
+    const progressFill = document.getElementById('progressFill');
+    const redirectNowBtn = document.getElementById('redirectNowBtn');
+    const toggleHoldBtn = document.getElementById('toggleHoldBtn');
+    const hiddenCopyBtn = document.getElementById('hiddenCopyBtn');
+    const toastEl = document.getElementById('copyToast');
+    
+    // state
+    let currentRedirectUrl = getInitialRedirectUrl();
+    let countdown = 5;
+    let countdownInterval = null;
+    let redirectTimeout = null;
+    let isHeld = false;
+    let isRedirectPending = true;
+    
+    // helper: toast message
+    function showToast(message, duration = 1500) {
+      if (!toastEl) return;
+      toastEl.textContent = message || '✨ Link copied';
+      toastEl.classList.add('show');
+      setTimeout(() => {
+        toastEl.classList.remove('show');
+      }, duration);
+    }
+    
+    // update countdown UI (seconds + progress)
+    function updateCountdownUI() {
+      if (countdownDisplay) {
+        countdownDisplay.textContent = countdown;
+        // animation refresh
+        countdownDisplay.style.animation = 'none';
+        countdownDisplay.offsetHeight;
+        countdownDisplay.style.animation = 'countPop 0.3s ease-out';
+      }
+      if (progressFill) {
+        const percent = (countdown / 5) * 100;
+        progressFill.style.width = `${percent}%`;
+      }
+    }
+    
+    // stop all timers
+    function haltTimers() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+      if (redirectTimeout) {
+        clearTimeout(redirectTimeout);
+        redirectTimeout = null;
+      }
+    }
+    
+    // perform redirect with lightning flash
+    function performRedirect() {
+      if (!currentRedirectUrl) return;
+      if (!isRedirectPending && redirectTimeout === null && countdownInterval === null) {
+        // already redirecting, avoid double
+      }
+      haltTimers();
+      isRedirectPending = false;
+      
+      // dramatic flash overlay
+      const flashDiv = document.createElement('div');
+      flashDiv.className = 'flash-overlay';
+      document.body.appendChild(flashDiv);
+      setTimeout(() => {
+        if (flashDiv && flashDiv.remove) flashDiv.remove();
+      }, 550);
+      
+      const safeDest = sanitizeRedirectUrl(currentRedirectUrl);
+      setTimeout(() => {
+        window.location.replace(safeDest);
+      }, 70);
+    }
+    
+    // start countdown from fresh (initial 5 seconds)
+    function startCountdown() {
+      haltTimers();
+      if (isHeld) return;
+      countdown = 5;
+      updateCountdownUI();
+      
+      redirectTimeout = setTimeout(() => {
+        if (!isHeld && isRedirectPending) {
+          performRedirect();
         }
-
-        function attachSlideRedirects() {
-            document.querySelectorAll('.slide').forEach(slide => {
-                slide.addEventListener('click', (e) => {
-                    if (e.target.closest('.dot')) return;
-                    const link = slide.getAttribute('data-slide-link');
-                    if (link) window.location.href = link;
-                });
-                const btn = slide.querySelector('.btn-slide');
-                if (btn) {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const link = btn.getAttribute('data-link');
-                        if (link) window.location.href = link;
-                    });
-                }
-            });
+      }, 5000);
+      
+      countdownInterval = setInterval(() => {
+        if (isHeld) return;
+        if (countdown <= 1) {
+          // about to redirect, clear interval so no extra step
+          if (countdownInterval) clearInterval(countdownInterval);
+          countdownInterval = null;
+          // countdown already 1, redirect will be triggered by timeout, but ensure if not
+          if (!isHeld && isRedirectPending && countdown === 1) {
+            // redirect handled by timeout, but avoid extra call
+          }
+        } else {
+          countdown--;
+          updateCountdownUI();
         }
-
-        function createDots() {
-            dotsContainer.innerHTML = '';
-            for (let i = 0; i < totalSlides; i++) {
-                const dot = document.createElement('div');
-                dot.classList.add('dot');
-                if (i === currentIndex) dot.classList.add('active');
-                dot.addEventListener('click', () => goToSlide(i));
-                dotsContainer.appendChild(dot);
-            }
+      }, 1000);
+    }
+    
+    // resume countdown from current countdown value (used after hold)
+    function resumeCountdownFromCurrent() {
+      haltTimers();
+      if (countdown <= 0) countdown = 1;
+      const remainingSecs = countdown;
+      
+      if (remainingSecs <= 0) {
+        performRedirect();
+        return;
+      }
+      
+      redirectTimeout = setTimeout(() => {
+        if (!isHeld && isRedirectPending) performRedirect();
+      }, remainingSecs * 1000);
+      
+      countdownInterval = setInterval(() => {
+        if (isHeld) return;
+        if (countdown <= 1) {
+          if (countdownInterval) clearInterval(countdownInterval);
+          countdownInterval = null;
+          // timeout will trigger redirect
+        } else {
+          countdown--;
+          updateCountdownUI();
         }
-
-        function updateDots() {
-            document.querySelectorAll('.dot').forEach((dot, idx) => {
-                dot.classList.toggle('active', idx === currentIndex);
-            });
-        }
-
-        function goToSlide(index) {
-            if (index < 0) index = totalSlides - 1;
-            if (index >= totalSlides) index = 0;
-            currentIndex = index;
-            slidesWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
-            updateDots();
-            resetAutoPlay();
-        }
-
-        function nextSlide() { goToSlide(currentIndex + 1); }
-        function prevSlide() { goToSlide(currentIndex - 1); }
-
-        function resetAutoPlay() {
-            if (autoInterval) clearInterval(autoInterval);
-            autoInterval = setInterval(() => nextSlide(), 5000);
-        }
-
-        function initSlider() {
-            buildSlides();
-            createDots();
-            goToSlide(0);
-            resetAutoPlay();
-
-            const container = document.querySelector('.slider-container');
-            // Pause auto on hover (no buttons, but keep hover pause)
-            container.addEventListener('mouseenter', () => { if (autoInterval) clearInterval(autoInterval); });
-            container.addEventListener('mouseleave', resetAutoPlay);
-
-            // Touch swipe support
-            let touchStartX = 0;
-            container.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
-                if (autoInterval) clearInterval(autoInterval);
-            }, { passive: true });
-            container.addEventListener('touchend', (e) => {
-                const diff = touchStartX - e.changedTouches[0].screenX;
-                if (Math.abs(diff) > 40) {
-                    if (diff > 0) nextSlide();
-                    else prevSlide();
-                }
-                resetAutoPlay();
-            });
-        }
-
-        // ==================== 3. COMPACT 3-PER-ROW CARDS (ORIGINAL LINKS) ====================
-        const sectionsData = [
-            { name: "Student Section", icon: "fas fa-user-lock", desc: "", tag: "Register / login", link: "./register.html" },
-            { name: "New Admission", icon: "fas fa-clipboard-list", desc: "", tag: "2026 Batches", link: "./addmision.html" },
-            { name: "Students ID card", icon: "fas fa-newspaper", desc: "", tag: "", link: "./login.html" },
-            { name: "Important Notification", icon: "fas fa-bullhorn", desc: "Latest alerts & updates", tag: "", link: "./index.html" },
-            { name: "Other Fee Payment", icon: "fas fa-qrcode", desc: "Pay fees securely online", tag: "", link: "./payment.html" }
-        ];
-
-        function buildTwelveSections() {
-            const grid = document.getElementById('twelveSectionsGrid');
-            grid.innerHTML = '';
-            sectionsData.forEach((item, idx) => {
-                const cardLink = document.createElement('a');
-                cardLink.className = 'resource-card card-animate';
-                cardLink.href = (item.link && item.link.trim() !== "") ? item.link : "#";
-                cardLink.style.animationDelay = `${idx * 0.04}s`;
-                let tagHtml = item.tag ? `<div class="badge-new">${item.tag}</div>` : '';
-                cardLink.innerHTML = `
-                    <div class="card-icon"><i class="${item.icon}"></i></div>
-                    <h4>${item.name}</h4>
-                    <p>${item.desc}</p>
-                    ${tagHtml}`;
-                grid.appendChild(cardLink);
-            });
-        }
-
-        // ==================== 4. FOOTER + WHATSAPP CHAT ====================
-        function setupFooterRedirects() {
-            const footerItems = document.querySelectorAll('.footer-item');
-            const linksMap = {
-                'Home': '/alpha-home',
-                'My Purchases...': '/my-purchases',
-            };
-            const whatsappNumber = '916202320527'; // Your WhatsApp number
-            const whatsappMessage = encodeURIComponent('Hello Triveni Pathsala! 👋 I need help.');
-            const whatsappURL = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
-
-            footerItems.forEach(item => {
-                const spanText = item.querySelector('span')?.innerText;
-                const isWhatsApp = item.getAttribute('data-link') === 'whatsapp';
-                item.addEventListener('click', () => {
-                    if (isWhatsApp) {
-                        window.open(whatsappURL, '_blank', 'noopener,noreferrer');
-                        item.style.transform = 'scale(0.9)';
-                        setTimeout(() => { item.style.transform = ''; }, 200);
-                        return;
-                    }
-                    const customLink = linksMap[spanText] || item.getAttribute('data-link') || '#';
-                    window.location.href = customLink;
-                });
-                item.addEventListener('touchstart', function() { this.style.transform = 'scale(0.92)'; }, { passive: true });
-                item.addEventListener('touchend', function() { this.style.transform = ''; });
-            });
-        }
-
-        // ==================== 5. NOTIFICATION ====================
-        function setupNotification() {
-            const bellBtn = document.getElementById('notificationBtn');
-            bellBtn.addEventListener('click', () => {
-                alert("🔔 New Notifications:\n\n• First Come, First Serve!\n");
-                const badge = bellBtn.querySelector('.notify-badge');
-                if (badge) {
-                    badge.style.animation = 'none';
-                    badge.offsetHeight;
-                    badge.style.animation = 'pulseBadge 0.6s ease-out 3';
-                }
-            });
-        }
-
-        // ==================== MAIN INIT ====================
-        window.addEventListener('DOMContentLoaded', () => {
-            initNameModal();
-            initSlider();
-            buildTwelveSections();
-            setupFooterRedirects();
-            setupNotification();
-            const welcomeStrip = document.querySelector('.welcome-strip');
-            if (welcomeStrip) {
-                welcomeStrip.style.opacity = '0';
-                welcomeStrip.style.transform = 'translateY(-10px)';
-                welcomeStrip.style.transition = 'all 0.5s ease 0.15s';
-                requestAnimationFrame(() => {
-                    welcomeStrip.style.opacity = '1';
-                    welcomeStrip.style.transform = 'translateY(0)';
-                });
-            }
-            console.log('✅ Triveni Pathsala ready! | Arrows removed | Shimmer cards | Footer lowered');
-        });
-    </script>
+      }, 1000);
+    }
+    
+    // hold / resume logic (toggle)
+    function toggleHold() {
+      if (isHeld) {
+        // RESUME
+        isHeld = false;
+        toggleHoldBtn.innerHTML = "⏸️ HOLD";
+        toggleHoldBtn.style.background = "";
+        // resume from current countdown value
+        if (countdown <= 0) countdown = 1;
+        resumeCountdownFromCurrent();
+      } else {
+        // HOLD (pause)
+        isHeld = true;
+        toggleHoldBtn.innerHTML = "▶️ RESUME";
+        toggleHoldBtn.style.background = "rgba(255,190,60,0.2)";
+        haltTimers(); // stop interval & timeout, countdown stays frozen
+      }
+    }
+    
+    // immediate redirect action
+    function redirectNow() {
+      if (isRedirectPending || true) {
+        performRedirect();
+      } else {
+        performRedirect(); // fallback safety
+      }
+    }
+    
+    // copy destination link WITHOUT preview
+    function copyDestinationLink() {
+      if (!currentRedirectUrl) {
+        showToast("⚠️ No redirect target", 1200);
+        return;
+      }
+      navigator.clipboard.writeText(currentRedirectUrl).then(() => {
+        showToast("⚡ Destination link copied", 1400);
+        // optional visual feedback on copy button
+        const btnSpan = hiddenCopyBtn.querySelector('span:last-child');
+        const originalText = btnSpan ? btnSpan.innerText : 'copy link';
+        if (btnSpan) btnSpan.innerText = '✓ copied!';
+        setTimeout(() => {
+          if (btnSpan) btnSpan.innerText = originalText;
+        }, 1200);
+      }).catch(() => {
+        showToast("❌ Copy failed", 1200);
+      });
+    }
+    
+    // init core
+    function init() {
+      // ensure UI doesn't show URL anywhere
+      isHeld = false;
+      isRedirectPending = true;
+      toggleHoldBtn.innerHTML = "⏸️ HOLD";
+      toggleHoldBtn.style.background = "";
+      startCountdown();
+      
+      // small console log for dev (no link exposure)
+      console.log("⚡ Triveni Pathsala · Vortex active | hidden destination mode");
+    }
+    
+    // attach event listeners
+    redirectNowBtn.addEventListener('click', redirectNow);
+    toggleHoldBtn.addEventListener('click', toggleHold);
+    if (hiddenCopyBtn) hiddenCopyBtn.addEventListener('click', copyDestinationLink);
+    
+    // clean timers before unload
+    window.addEventListener('beforeunload', () => {
+      haltTimers();
+    });
+    
+    init();
+  })();
+</script>
 </body>
 </html>
